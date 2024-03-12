@@ -10,6 +10,7 @@ const express = require('express');
 const axios = require('axios');
 //Axios is a popular, promise-based HTTP client that sports an easy-to-use API and can be used in both the browser and Node.js.
 const cors = require('cors');
+
 //CORS is a node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options.
 const app = express();
 const port = 3000 || process.env.PORT;
