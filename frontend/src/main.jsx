@@ -14,21 +14,16 @@ import Sidebar from './components/landing-page/Navbar';
 import Header from './components/landing-page/header';
 import PracQues from './pages/UserPages/Practice';
 import ResourcePage from './pages/UserPages/Resources';
-import CompFun from './pages/UserPages/CompetitionPageUser';
-import CompQuesPage from './pages/UserPages/CompQues';
-import Admincomp from './pages/AdminPages/AdminCompetition';
-import CreateCompetitionForm from './pages/AdminPages/AdminCreateComp';
-import CreateQuestionForm from './pages/AdminPages/QuestionCreation';
-import Adminquestion from './pages/AdminPages/AdminQuestion';
+
 import AdminDashboard from './pages/AdminPages/AdminDashboard';
-import EditContest from './pages/AdminPages/EditContest';
-import CompDesc from './pages/UserPages/CompetitionDesc';
+
 import Videochat from './pages/UserPages/Videochat';
 import Unauthorized from './pages/AdminPages/Unauthorized';
-import EditQuestionForm from './pages/AdminPages/EditQuestion';
+
 import Profile from './pages/UserPages/ProfilePage';
-import Chatbot from './pages/UserPages/Forum';
+
 import './index.css';
+import ClinicDashboard from './pages/Clinincs/Clinic';
 // Create a custom theme with the desired default color mode (dark)
 const customTheme = extendTheme({
   fonts: {
@@ -56,6 +51,7 @@ const App = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [username, setUsername] = useState('');
   const [isadmin, setIsadmin] = useState(false);
+  const [isdoctor, setIsdoctor] = useState(false);
 
   useEffect(() => {
     const storedAuthData = localStorage.getItem('authData');
@@ -65,22 +61,45 @@ const App = () => {
       setIsRegistered(true);
       setUsername(authData.username);
       setIsadmin(authData.isadmin);
+      setIsdoctor(authData.isdoctor);
     }
   }, []);
 
+
+
+
   const handleSignupSuccess = async (userdata, isAdmin) => {
     setIsadmin(isAdmin);
-
+    
     try {
       const user = auth.currentUser;
       const isadmin = isAdmin;
+      console.log("user",user.email);
+   
+  
       if (user) {
+        // Check if the user's email contains a specific domain associated with doctors
+        if (user.email.includes('@med.com')) {
+          console.log('User is a doctor');
+          setIsdoctor(true);
+          setIsRegistered(true);
+          const userDoc = await getDoc(doc(firestore, 'username', user.email));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUsername(userData.username);
+            setIsRegistered(true);
+            console.log("user data of doctor ",userData);
+    
+            localStorage.setItem('authData', JSON.stringify({ username: userData.username }));
+          }
+        }
+  
         const userDoc = await getDoc(doc(firestore, 'username', user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
           setUsername(userData.username);
           setIsRegistered(true);
-
+  
           localStorage.setItem('authData', JSON.stringify({ username: user.displayName, uid: user.uid, isadmin: isAdmin }));
         }
       }
@@ -89,6 +108,7 @@ const App = () => {
       console.log(error);
     }
   };
+
 
   const afterlogout = () => {
     setIsRegistered(false);
@@ -108,6 +128,7 @@ const App = () => {
           username: username,
           handleSignupSuccess: handleSignupSuccess,
           afterlogout: afterlogout,
+          isdoctor: isdoctor
         }}
       >
         <BrowserRouter>
@@ -122,22 +143,11 @@ const App = () => {
               <Route path="/login" element={<LoginPage handleSignupSuccess={handleSignupSuccess} />} />
               <Route path="/signup" element={<SignUpPage handleSignupSuccess={handleSignupSuccess} />} />
               <Route path='/profile' element={<Profile/>}/>
-              <Route path="/chat" element={<Chatbot/>}/>
               <Route path="/practice" element={<PracQues />} />
-              <Route path="/question" element={<QuestionPage />} />
               <Route path="/resource" element={<ResourcePage />} />
-              <Route path="/competition" element={<CompFun />} />
-              <Route path="/compdesc/:competitionId" element={<CompDesc />} />
-              <Route path="/compques/:competitionId" element={<CompQuesPage />} />
-              <Route path="/question/:competitionId/:questionId" element={<QuestionPage/>} />
-           
               <Route path="/admin" element={isadmin ? <AdminDashboard /> : <Unauthorized />} />
-              <Route path="/admincompetition" element={isadmin ? <Admincomp /> : <Unauthorized />} />
-              <Route path="/createcomp" element={isadmin ? <CreateCompetitionForm /> : <Unauthorized />} />
-              <Route path="/adminquestion/:competitionId" element={isadmin ? <Adminquestion /> : <Unauthorized />} />
-              <Route path="/createques/:competitionId" element={isadmin ? <CreateQuestionForm /> : <Unauthorized />} />
-              <Route path="/editques/:competitionId/:questionId" element={isadmin ? <EditQuestionForm /> : <Unauthorized />} />
-              <Route path="/editcomp/:competitionId" element={isadmin ? <EditContest /> : <Unauthorized />} />            </Routes>
+              <Route path="/clinic" element={<ClinicDashboard />} />
+                   </Routes>
           </ChakraProvider>
         </BrowserRouter>
       </AuthContext.Provider>

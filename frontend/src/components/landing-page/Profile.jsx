@@ -18,10 +18,10 @@ ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale,BarElemen
 
 function Profile() {
     const storedAuthData = localStorage.getItem('authData');
+   
  
     const authData = JSON.parse(storedAuthData);
-    const uid =authData.uid;
-    console.log("profile",uid)
+
     const { username } = React.useContext(AuthContext); // Get username from the AuthContext
     const [skills,setSkill] = React.useState([]);
     const [profileUrl,setProfileUrl]=React.useState("");
