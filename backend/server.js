@@ -11,6 +11,10 @@ const axios = require('axios');
 //Axios is a popular, promise-based HTTP client that sports an easy-to-use API and can be used in both the browser and Node.js.
 const cors = require('cors');
 
+const logger = require('winston');
+
+const mongoose = require('mongoose');
+
 //CORS is a node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options.
 const app = express();
 const port = 3000 || process.env.PORT;
@@ -21,6 +25,12 @@ const path = require('path');
 const mime = require('mime-types');
 const api = process.env.x
 console.log(api);
+
+
+mongoose.connect(process.env.MONGODB_URI,)
+  .then(() => logger.info('Connected to MongoDB'))
+  .catch(err => logger.error('MongoDB connection error:', err));
+
 
 const openaiapi = process.env.OPENAI_API_KEY
 console.log(openaiapi);
@@ -42,7 +52,7 @@ var generator = require('generate-password');
     .auth()
     .listUsers()
     .then((userRecords) => {
-      console.log(userRecords);
+     
       // The Admin SDK is authenticated and the user list was retrieved successfully
       console.log('Firebase Admin SDK is properly set up');
       console.log('Total user:', userRecords.users.length);
@@ -128,6 +138,7 @@ var generator = require('generate-password');
     app.post('/create-user', async (req, res) => {
       try {
         const { email } = req.body;
+        const { name } = req.body;
     
         // Generate a random password
         const password = generator.generate({
@@ -141,6 +152,7 @@ var generator = require('generate-password');
         const userRecord = await admin.auth().createUser({
           email,
           password,
+          displayName: name,
         });
     
         // Assign the doctor role to the user
@@ -153,6 +165,118 @@ var generator = require('generate-password');
         res.status(500).json({ success: false, error: 'Failed to create user' });
       }
     });
+
+
+
+
+
+
+    const Doctor = require('./models/doctors');
+    // Endpoint to save doctor details in MongoDB
+
+    app.post('/save-doctor', async (req, res) => {
+      try {
+        const { name, specialization, availability } = req.body;
+    
+        // Create a new Doctor document
+        const doctor = new Doctor({
+          name,
+          specialization,
+          availability,
+          role: 'doctor',
+        });
+
+        // save the doctor details inside the colection Doctors if the doctor is created in mongodb database console log the message
+
+        await doctor.save();
+
+        if (doctor){
+          console.log("doctor created in mongodb database");
+        }
+        
+    
+    
+        res.status(200).json({ success: true });
+      } catch (error) {
+        console.error('Error saving doctor details:', error);
+        res.status(500).json({ success: false, error: 'Failed to save doctor details' });
+      }
+    }
+    );
+
+
+
+    // Endpoint to fetch all doctors from MongoDB
+
+    app.get('/doctors', async (req, res) => {
+      try {
+        const doctors = await Doctor.find({});
+        res.status(200).json(doctors);
+      } catch (error) {
+        console.error('Error fetching doctors:', error);
+        res.status(500).json({ error: 'Failed to fetch doctors' });
+      }
+    }
+    );
+
+
+    // Endpoint to save patient details in MongoDB
+    app.post('/save-patient/:doctorName', async (req, res) => {
+      
+    
+      try {
+        const { doctorName } = req.params;
+      const { patientName, bookedSlot } = req.body;
+        // Find the doctor document with the doctor name
+
+        const doctor = await Doctor.findOne({ name: doctorName });
+
+
+        
+    
+        if (!doctor) {
+          console.log("doctor not found");
+          return res.status(404).json({ success: false, error: 'Doctor not found' });
+         
+        }
+    
+        // Update the doctor's document to save patient details
+        doctor.patients.push({ name: patientName, bookedSlot });
+  
+        await doctor.save();
+    
+        res.status(200).json({ success: true });
+      } catch (error) {
+        console.error('Error saving patient details:', error);
+        res.status(500).json({ success: false, error: 'Failed to save patient details' });
+      }
+    });
+
+
+    // Endpoint to fetch patients for a specific doctor from MongoDB
+
+    app.get('/patients/:doctorName', async (req, res) => {
+      try {
+        const { doctorName } = req.params;
+    
+        // Find the doctor document with the doctor name
+        const doctor = await Doctor.findOne
+        ({ name: doctorName });
+
+        if (!doctor) {
+          return res.status(404).json({ success: false, error: 'Doctor not found' });
+        }
+
+        res.status(200).json(doctor.patients);
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+        res.status(500).json({ error: 'Failed to fetch patients' });
+      }
+    }
+    );
+
+
+    
 
     
 

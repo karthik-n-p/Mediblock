@@ -18,7 +18,6 @@ ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale,BarElemen
 
 function Profile() {
     const storedAuthData = localStorage.getItem('authData');
-   
  
     const authData = JSON.parse(storedAuthData);
 

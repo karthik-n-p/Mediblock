@@ -255,33 +255,28 @@ export default function LandingContent() {
                 md: 10,
               }}
             >
-              <Feature title="Invite team members">
-                Improve your conversion rates by monitoring exactly what’s going
-                on while your customers are in trial.{" "}
+              <Feature title="Upload Medical Records">
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Temporibus, soluta..{" "}
               </Feature>
-              <Feature title="Unify your payments stack">
-                Manage all your online and offline sales in one place with a
-                single integration, simplifying reporting and reconciliation.
+              <Feature title="Find your doctor">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro, reiciendis?
               </Feature>
-              <Feature title="Own your in-store experience">
+              <Feature title="See realtime health status">
                 {" "}
-                Provide a seamless customer experience across channels, like
-                reserving online and picking up in store.
+               Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima, laboriosam.
               </Feature>
-              <Feature title="Grow your platform’s revenue">
+              <Feature title="Manage your clinic/hospital online">
                 {" "}
-                Add in-person payments to your platform or marketplace. Using
-                Terminal with Connect.{" "}
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam, exercitationem.
+                {" "}
               </Feature>
-              <Feature title="Clear overview for efficient tracking">
+              <Feature title="Enjoy blockchain security">
                 {" "}
-                Handle your subscriptions and transactions efficiently with the
-                clear overview in Dashboard. Fea
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quas, eligendi?
               </Feature>
-              <Feature title="Decide how you integrate Payments">
+              <Feature title="Interact online with you Doctor">
                 {" "}
-                Love to code? Decide how you integrate Payments and build
-                advanced and reliable products yourself from scratch.{" "}
+               Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, dolore.{" "}
               </Feature>
             </Stack>
           </GridItem>

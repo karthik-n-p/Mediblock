@@ -37,32 +37,30 @@ const ClinicDashboard = () => {
     }
 
     try {
-      const createUserResponse = await axios.post('http://localhost:3000/create-user', { email: institutionalEmail });
+      const createUserResponse = await axios.post('http://localhost:3000/create-user', { email: institutionalEmail , name: name });
 
       if (createUserResponse.data.success) {
         // Doctor creation successful, proceed to save details in Firestore
-        const docRef = doc(firestore, "Doctors", name); // Assuming name is unique for each doctor
-
-        await setDoc(docRef, {
+        const doctorData = {
           name,
           specialization,
           availability,
           role: "doctor",
-        });
+        };
 
-        const userDocRef = doc(firestore, "username", institutionalEmail );
-        await setDoc(userDocRef, {
-            username: name,
-        });
+        const saveDoctorResponse = await axios.post('http://localhost:3000/save-doctor', doctorData);
+
+        if (saveDoctorResponse.data.success) {
+          toast({
+            title: "Success",
+            description: "Doctor details added successfully",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });}
 
 
-        toast({
-          title: "Success",
-          description: "Doctor details added successfully",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
+
 
         // Reset form fields after successful submission
         setName("");
@@ -121,8 +119,8 @@ const ClinicDashboard = () => {
           >
             <option value="">Select specialization</option>
             <option value="Cardiology">Cardiology</option>
-            <option value="Pediatrics">Pediatrics</option>
-            <option value="Dermatology">Dermatology</option>
+            <option value="Pediatrician">Pediatrics</option>
+            <option value="Dermatologist">Dermatology</option>
           </Select>
         </FormControl>
         <FormControl>

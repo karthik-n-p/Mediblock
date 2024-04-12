@@ -2,25 +2,72 @@ import React, { useContext, useEffect, useState } from "react";
 import { Box, Button, Grid, GridItem, Input, Select, Text, VStack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "./AuthContext";
-import { doc, setDoc ,getDoc,getDocs ,collection} from "firebase/firestore";
-import { firestore } from './firebase-auth'; // Assuming you have already initialized Firebase in firebase-auth.js
-
-
+import axios from 'axios';
 
 const DoctorCard = ({ doctor, bookSlot }) => {
-    
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [selectedDay, setSelectedDay] = useState(null);
 
-
-   
-  const handleBookSlot = (slot,name) => {
-      console.log("slot",slot, "doctor name",name); 
- 
-      setSelectedSlot(slot);
-
-      bookSlot(slot,name);
-    
+  const handleBookSlot = (slot, name) => {
+    console.log("slot", slot, "doctor name", name);
+    setSelectedSlot(slot);
+    bookSlot(slot, name);
   };
+
+  const handleDayClick = (day) => {
+    setSelectedDay(day);
+  };
+
+
+
+
+  const currentDayIndex = new Date().getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
+  const week = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].slice(currentDayIndex); // Start from the current day
+  const availability = doctor.availability;
+
+const availabilityh = {
+  "Sun": doctor.availability[0] || false,
+  "Mon": doctor.availability[1] || false,
+  "Tue": doctor.availability[2] || false,
+  "Wed": doctor.availability[3] || false,
+  "Thu": doctor.availability[4] || false,
+  "Fri": doctor.availability[5] || false,
+  "Sat": doctor.availability[6] || false
+};
+
+
+
+
+
+ 
+  const nextThreeDays = days.slice(0, 3); // Get next three days
+  if (nextThreeDays.length < 3) {
+    // If there are less than 3 days left in the week, add the remaining days from the start of the week
+    nextThreeDays.push(...week.slice(0, 3 - nextThreeDays.length) );
+  }
+
+  const slots = ['9:30 - 10:00 AM', '11:00 - 11:30 AM', '2:00- 3:00 PM', '4:00- 5:00 PM'];
+  console.log("",doctor.name)
+
+  const slotsData =  availabilityh[selectedDay] ? (
+    <>
+    
+      <Text fontWeight="bold">{nextThreeDays[selectedDay]}</Text>
+      <Grid templateColumns="repeat(2, 1fr)" gap={2}>
+        {slots.map((slot, slotIndex) => (
+          <Button 
+            padding={2}
+            key={slotIndex}
+            onClick={() => handleBookSlot(slot, doctor.name)}
+            colorScheme={selectedSlot === slot ? "teal" : "gray"}
+          >
+            {slot}
+          </Button>
+        ))}
+      </Grid>
+    </>
+  ) : null;
 
   return (
     <GridItem>
@@ -31,18 +78,24 @@ const DoctorCard = ({ doctor, bookSlot }) => {
         <Text fontWeight="bold">{doctor.name}</Text>
         <Text fontSize="sm">{doctor.speciality}</Text>
         <Box>
-          <Text mb={2}>Select Time Slot:</Text>
-          <Grid templateColumns="repeat(4, 1fr)" gap={2}>
-            {Array.from({ length: 4 }).map((_, index) => (
+          <Text mb={2}>Select Day:</Text>
+          <Grid templateColumns={`repeat(${nextThreeDays.length}, 1fr)`} gap={2}>
+            
+            {nextThreeDays.map((day, index) => (
+              console.log("availability",day,availabilityh["Tue"]) ||
               <Button
                 key={index}
-                onClick={() => handleBookSlot(index,doctor.name)}
-                colorScheme={selectedSlot === index ? "teal" : "gray"}
+                onClick={() => handleDayClick(day)}
+                colorScheme={(availabilityh[day]) ? "teal" : "red"}
               >
-                {index}
+                {day}
               </Button>
             ))}
           </Grid>
+        </Box>
+        <Box>
+          <Text mb={2}>Select Time Slot:</Text>
+          {slotsData}
         </Box>
         <Button onClick={() => handleBookSlot(Math.floor(Math.random() * 4))} colorScheme="teal">Book Meeting</Button>
       </VStack>
@@ -66,8 +119,6 @@ const PatientCard = ({ patient, consult }) => {
       </VStack>
     );
   };
-  
-  
 
 const PracQues = () => {
     const { username } = React.useContext(AuthContext);
@@ -80,94 +131,64 @@ const PracQues = () => {
 
     const {isdoctor} = useContext(AuthContext);
 
-
-    console.log("username",username);
-    console.log("isdoctor",isdoctor);
-  
     useEffect(() => {
       fetchDoctors();
      
       if (isdoctor) {
         console.log("fetching patients");
-
         fetchPatients(username); // Fetch patients data for the currently logged-in patient
       }
     }, [ isdoctor, username]);
   
     const fetchDoctors = async () => {
-      const doctorsCollection = collection(firestore, 'Doctors');
-      const doctorsSnapshot = await getDocs(doctorsCollection);
-      const doctorsData = doctorsSnapshot.docs.map(doc => doc.data());
+      const doctorsCollection = await axios.get('http://localhost:3000/doctors');
+      const doctorsData = doctorsCollection.data;
       setDoctorsData(doctorsData);
+      console.log("doctors data",doctorsData);
     };
+
     const fetchPatients = async (doctorName) => {
-        console.log("inside fetch patient", doctorName);
-        const doctorRef = doc(firestore, 'Doctors', doctorName);
-        const doctorSnapshot = await getDoc(doctorRef);
+      console.log("inside fetch patient", doctorName);
+      const patientsCollection = await axios.get(`http://localhost:3000/patients/${doctorName}`);
+      const patientsData = patientsCollection.data;
+      setPatients(patientsData);
+      console.log("patients data",patientsData);
+    };
 
-      
-        if (doctorSnapshot.exists()) {
-          const doctorData = doctorSnapshot.data();
-          console.log("doctor data",doctorData.patients);
-          const patientsData = doctorData.patients; // Assuming patients is the name of the map containing patient data
-          const patientsArray = Object.entries(patientsData).map(([name, slot]) => ({ name, bookedSlot: slot }));
-          setPatients(patientsArray);
-          console.log("patients array",patientsArray);
-        } else {
-          console.log(`Doctor ${doctorName} not found.`);
-          setPatients([]);
+    const bookSlot = async (slot, name) => {
+      if (!isdoctor) {
+        console.log(`Booking slot ${slot} for ${name}`);
+        try {
+          await axios.post(`http://localhost:3000/save-patient/${name}`, {
+            patientName: username,
+            bookedSlot: slot,
+          });
+          console.log('Booked slot');
+          navigate(`/room/${roomCode}`);
+        } catch (error) {
+          console.error('Error booking slot:', error);
         }
-      };
-  
-    const bookSlot = async (slot,name) => {
-        if (!isdoctor) {
-          console.log(`Booking slot ${slot} for ${username}`);
-        
-          // Find the selected doctor's document
-          const selectedDoctor = doctorsData.find(doctor => doctor.name === doctor.name); // Assuming `doctor.name` is the unique identifier for each doctor
-        
-          // Check if the selected doctor exists
-          if (selectedDoctor) {
-            const doctorRef = doc(firestore, 'Doctors', selectedDoctor.name);
-            await setDoc(doctorRef, {
-                patients: {
-                    [username]: {
-                        bookedSlot: slot,
-                    },
-                    },
-            }, { merge: true });
+      } else {
+        fetchPatients(username); // Fetch patients data for the currently logged-in doctor
+      }
+    };
 
-          
-      
-            console.log('booked slot');
-
-            navigate(`/room/${roomCode}`)
-          } else {
-            console.log(`Doctor not found.`);
-          }
-        } else {
-          // Logic for when the user is a doctor
-          // Fetch patients data for the currently logged-in doctor
-          fetchPatients(username);
-        }
-    
-      };
-  
     const joinMeeting = (patientId) => {
       console.log(`Joining meeting for Patient ${patientId}`);
       navigate(`/room/${roomCode}`);
     };
-  
+
     const filteredDoctors = doctorsData.filter(doctor =>
+      console.log("doctor",doctor.specialization,selectedDisease) ||
       doctor.name.toLowerCase().includes(searchValue.toLowerCase()) &&
-      (selectedDisease === "" || doctor.speciality === selectedDisease)
+      (selectedDisease === "" || doctor.specialization === selectedDisease)
     );
-  
+
     useEffect(() => {
-    //   // Navigate when roomCode changes
-    //   if (roomCode) {
-    //     navigate(`/room/${roomCode}`);
-    //   }
+      // Navigate when roomCode changes
+      // if (roomCode) {
+      //   navigate(`/room/${roomCode}`);
+      // }
     }, [roomCode, navigate]);
   
     return (
@@ -182,7 +203,7 @@ const PracQues = () => {
               <Text mb={2} fontSize="lg" fontWeight="bold">Filter by Disease:</Text>
               <Select placeholder="Select disease" value={selectedDisease} onChange={(e) => setSelectedDisease(e.target.value)}>
                 <option value="">All</option>
-                <option value="Cardiologist">Cardiologist</option>
+                <option value="Cardiology">Cardiologist</option>
                 <option value="Pediatrician">Pediatrician</option>
                 <option value="Dermatologist">Dermatologist</option>
               </Select>
@@ -205,4 +226,3 @@ const PracQues = () => {
   };
   
   export default PracQues;
-  

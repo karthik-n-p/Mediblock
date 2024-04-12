@@ -24,7 +24,7 @@ const checkAdmin = async (user) => {
     const uid=user.uid;
     console.log(uid);
     //post request to backend to check if user is admin or not using axios passing uid as parameter
-    axios.post('https://codespace-iaeh.onrender.com/admin-status', {uid})
+    axios.post('http://localhost:3000/admin-status', {uid})
     .then((response) => {
       console.log("check admin status",response.data.isAdmin);
       if(response.data){
@@ -38,6 +38,7 @@ const checkAdmin = async (user) => {
 
       }
       else{
+        console.log("user is not admin");
         handleSignupSuccess(user,response.data.isAdmin)
      
         navigate('/')
