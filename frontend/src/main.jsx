@@ -15,7 +15,7 @@ import Header from './components/landing-page/header';
 import PracQues from './pages/UserPages/Practice';
 import ResourcePage from './pages/UserPages/Resources';
 
-import AdminDashboard from './pages/AdminPages/AdminDashboard';
+import DoctorDashboard1 from './pages/AdminPages/AdminDashboard';
 
 import Videochat from './pages/UserPages/Videochat';
 import Unauthorized from './pages/AdminPages/Unauthorized';
@@ -146,7 +146,7 @@ const App = () => {
               <Route path='/profile' element={<Profile/>}/>
               <Route path="/practice" element={<PracQues />} />
               <Route path="/resource" element={<ResourcePage />} />
-              <Route path="/admin" element={isadmin ? <AdminDashboard /> : <Unauthorized />} />
+              <Route path="/admin" element={isadmin ? <DoctorDashboard1 /> : <Unauthorized />} />
               <Route path="/clinic" element={<ClinicDashboard />} />
                    </Routes>
           </ChakraProvider>
