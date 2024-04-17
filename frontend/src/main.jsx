@@ -15,6 +15,7 @@ import Header from './components/landing-page/header';
 import PracQues from './pages/UserPages/Practice';
 
 import DoctorDashboard from './pages/AdminPages/AdminDashboard';
+import DoctorDashboard1 from './pages/AdminPages/AdminDashboard';
 
 import Videochat from './pages/UserPages/Videochat';
 import Unauthorized from './pages/AdminPages/Unauthorized';
@@ -174,6 +175,9 @@ const App = () => {
               <Route path='/Upload' element={<Upload />} />
               <Route path='/doctordashboard' element={<DoctorDashboard />} />
               <Route path='/bookslot/:name' element={<BookSlot/>}/>
+              <Route path="/resource" element={<ResourcePage />} />
+              <Route path="/admin" element={isadmin ? <DoctorDashboard1 /> : <Unauthorized />} />
+              <Route path="/clinic" element={<ClinicDashboard />} />
                    </Routes>
           </ChakraProvider>
         </BrowserRouter>
