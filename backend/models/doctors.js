@@ -1,14 +1,65 @@
 // doctor.js
 
 const mongoose = require('mongoose');
+const { cli } = require('winston/lib/winston/config');
+const Clinic = require('./clinic');
 
 // Define the Doctor schema
 const doctorSchema = new mongoose.Schema({
   name: String,
   specialization: String,
-  availability: [Boolean],
   role: String,
-  patients: [{ name: String, bookedSlot: Number }],
+  clinicId: String,
+  ClinicName: String,
+
+  numberofAppointments: {
+    type: Number,
+    default: 0,
+  },
+  numberofofflineAppointments: {
+    type: Number,
+    default: 0,
+  },
+  numberofonlineAppointments: {
+    type: Number,
+    default: 0,
+  },
+
+  availability : [{
+    date: Date, // Date for which availability is specified
+    timeSlots: [{ 
+      startTime: String, 
+      endTime: String,
+      availability: Boolean
+    }]
+  }],
+
+  
+appointment: [{ 
+    patientId: String,
+    patientName: String,
+    bookedSlot: [{ date : String, startTime: String, endTime: String }],
+    status: String,
+    meetingLink: String,
+    mode: String,
+  }],
+
+
+  sharedDocuments: [{ 
+    patientId: String,
+    files: [{ 
+      filename: String,
+      fileSize: Number,
+      ipfsHash: String,
+    }]
+  }],
+
+  
+
+
+
+
+
 });
 
 // Create and export the Doctor model

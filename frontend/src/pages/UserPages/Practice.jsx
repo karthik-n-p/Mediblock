@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Button, Grid, GridItem, Input, Select, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Grid, GridItem, HStack, Input, Select, Text, VStack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "./AuthContext";
 import axios from 'axios';
@@ -7,102 +7,38 @@ import axios from 'axios';
 const DoctorCard = ({ doctor, bookSlot }) => {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
+  const navigate =useNavigate();
 
-  const handleBookSlot = (slot, name) => {
-    console.log("slot", slot, "doctor name", name);
-    setSelectedSlot(slot);
-    bookSlot(slot, name);
+
+  const handleBookSlot = (doctorName) => {
+    navigate(`/bookslot/${doctorName}`);
+
+
+
+   
   };
-
-  const handleDayClick = (day) => {
-    setSelectedDay(day);
-  };
-
-
-
-
-  const currentDayIndex = new Date().getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
-  const week = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].slice(currentDayIndex); // Start from the current day
-  const availability = doctor.availability;
-
-const availabilityh = {
-  "Sun": doctor.availability[0] || false,
-  "Mon": doctor.availability[1] || false,
-  "Tue": doctor.availability[2] || false,
-  "Wed": doctor.availability[3] || false,
-  "Thu": doctor.availability[4] || false,
-  "Fri": doctor.availability[5] || false,
-  "Sat": doctor.availability[6] || false
-};
-
-
-
 
 
  
-  const nextThreeDays = days.slice(0, 3); // Get next three days
-  if (nextThreeDays.length < 3) {
-    // If there are less than 3 days left in the week, add the remaining days from the start of the week
-    nextThreeDays.push(...week.slice(0, 3 - nextThreeDays.length) );
-  }
-
-  const slots = ['9:30 - 10:00 AM', '11:00 - 11:30 AM', '2:00- 3:00 PM', '4:00- 5:00 PM'];
-  console.log("",doctor.name)
-
-  const slotsData =  availabilityh[selectedDay] ? (
-    <>
-    
-      <Text fontWeight="bold">{nextThreeDays[selectedDay]}</Text>
-      <Grid templateColumns="repeat(2, 1fr)" gap={2}>
-        {slots.map((slot, slotIndex) => (
-          <Button 
-            padding={2}
-            key={slotIndex}
-            onClick={() => handleBookSlot(slot, doctor.name)}
-            colorScheme={selectedSlot === slot ? "teal" : "gray"}
-          >
-            {slot}
-          </Button>
-        ))}
-      </Grid>
-    </>
-  ) : null;
-
   return (
-    <GridItem>
-      <VStack spacing={4} alignItems="center" bg="white" p={4} borderRadius="md" boxShadow="md">
+   
+      <VStack display={'flex'} alignItems={'left'} justifyContent={'left'} spacing={2}  bg="white" p={4} borderRadius="md" boxShadow="md">
+        
         <Box borderRadius="xl" overflow="hidden" boxShadow="md" w="100%">
           <img src={`https://via.placeholder.com/300x300?text=${doctor.name}`} alt={doctor.name} />
         </Box>
-        <Text fontWeight="bold">{doctor.name}</Text>
-        <Text fontSize="sm">{doctor.speciality}</Text>
-        <Box>
-          <Text mb={2}>Select Day:</Text>
-          <Grid templateColumns={`repeat(${nextThreeDays.length}, 1fr)`} gap={2}>
-            
-            {nextThreeDays.map((day, index) => (
-              console.log("availability",day,availabilityh["Tue"]) ||
-              <Button
-                key={index}
-                onClick={() => handleDayClick(day)}
-                colorScheme={(availabilityh[day]) ? "teal" : "red"}
-              >
-                {day}
-              </Button>
-            ))}
-          </Grid>
-        </Box>
-        <Box>
-          <Text mb={2}>Select Time Slot:</Text>
-          {slotsData}
-        </Box>
-        <Button onClick={() => handleBookSlot(Math.floor(Math.random() * 4))} colorScheme="teal">Book Meeting</Button>
+        <Text fontSize={'24px'} color={'black'} >{doctor.name}</Text>
+        <Text fontSize="sm">Specialist: {doctor.specialization}</Text>
+
+        <Text fontSize="sm">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odit exercitationem facilis, ex eveniet laudantium incidunt officiis?</Text>
+     
+        <Button onClick={() => handleBookSlot(doctor.name)} colorScheme="teal" >
+          Book Meeting
+        </Button>
       </VStack>
-    </GridItem>
+
   );
 };
-
 const PatientCard = ({ patient, consult }) => {
     return (
       <VStack spacing={4} alignItems="center" bg="white" p={4} borderRadius="md" boxShadow="md">
@@ -150,9 +86,15 @@ const PracQues = () => {
     const fetchPatients = async (doctorName) => {
       console.log("inside fetch patient", doctorName);
       const patientsCollection = await axios.get(`http://localhost:3000/patients/${doctorName}`);
+      console.log("patients data",patientsCollection);
       const patientsData = patientsCollection.data;
+      if(patientsData.length === 0){
+        console.log("No patients found");
+      }
+      else{
       setPatients(patientsData);
-      console.log("patients data",patientsData);
+      }
+     
     };
 
     const bookSlot = async (slot, name) => {
@@ -208,18 +150,18 @@ const PracQues = () => {
                 <option value="Dermatologist">Dermatologist</option>
               </Select>
             </Box>
-            <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+            <HStack  gap={6}>
               {filteredDoctors.map((doctor) => (
                 <DoctorCard key={doctor.id} doctor={doctor} bookSlot={bookSlot} />
               ))}
-            </Grid>
+            </HStack>
           </>
         ) : (
-          <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+          <HStack templateColumns="repeat(3, 1fr)" gap={6}>
             {patients.map((patient) => (
               <PatientCard key={patient.id} patient={patient} consult={() => joinMeeting(patient.id)} />
             ))}
-          </Grid>
+          </HStack>
         )}
       </Box>
     );

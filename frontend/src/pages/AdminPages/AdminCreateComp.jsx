@@ -113,7 +113,7 @@ const CreateCompetitionForm = () => {
       </HStack>
 
       <Text color="grey1" fontSize={15} fontStyle="italic">
-        Host your own coding contest on CodeSpace. You can practice and compete with friends from your <br />
+        Host your ownD coding contest on CodeSpace. You can practice and compete with friends from your <br />
         organization or school. Select from our library of over coding challenges or create your own.
         Get started by providing the initial details for your contest.
       </Text>

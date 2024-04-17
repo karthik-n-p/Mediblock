@@ -1,59 +1,47 @@
+import React from 'react';
+import { Flex, Box, Heading, SimpleGrid, Stat, StatLabel, StatNumber } from '@chakra-ui/react';
 
-
-//Manikoth
-
-
-import React, { useEffect, useState } from 'react'
-import { Text,Box,Flex,Heading,Grid,Button,Icon,Divider, Menu, MenuButton, MenuList, MenuItem, Stack} from '@chakra-ui/react'
-import { AiOutlinePlus } from 'react-icons/ai';
-import image from '../../assets/graph.webp'
-import { FaEdit, FaPlusCircle, FaUser, FaUserCircle, FaUsers } from 'react-icons/fa';
-import { AiOutlineEye } from "react-icons/ai";
-import { Link } from 'react-router-dom';
-import moment from 'moment';
-import axios from 'axios';
-
-
-
-function AdminDashboard() {
-  const serialNumber = 1;
-  const studentName = "Zeus B Hunter";
-  const scoreGot = "180";
-  const [selectedOption, setSelectedOption] = useState("");
-
-  const handleOptionSelect = (option) => {
-    setSelectedOption(option);
-  };
-
-  const [ongoingCompetitions, setOngoingCompetitions] = useState([]);
-  useEffect(() => {
-    axios
-    .get("https://codespace-iaeh.onrender.com/get-ongoing-competitions")
-    .then((response) => {
-      console.log("response.data", response.data);
-      const ongoingCompetitionsArray = response.data.ongoingCompetitions;
-      console.log("ongoingCompetitionsArray", ongoingCompetitionsArray);
-
-      setOngoingCompetitions(ongoingCompetitionsArray);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-
-
-  // Remaining code...
-}, []);
-
-
-const today = moment();
-
+const DoctorDashboard = () => {
+  // Dummy data for pending appointments, scheduled appointments, and patient list
+  const pendingAppointments = 5;
+  const scheduledAppointments = 10;
+  const patientList = [
+    { id: 1, name: 'John Doe' },
+    { id: 2, name: 'Jane Smith' },
+    { id: 3, name: 'Alice Johnson' },
+    // Add more patients as needed
+  ];
 
   return (
-    <div >
+    <Flex direction="column" align="center" justify="center" minHeight="100vh">
+      <Heading mb={8}>Doctor Dashboard</Heading>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8} width="80%">
+        {/* Pending Appointments Card */}
+        <Box p={4} borderWidth="1px" borderRadius="lg" boxShadow="md">
+          <Stat>
+            <StatLabel>Pending Appointments</StatLabel>
+            <StatNumber>{pendingAppointments}</StatNumber>
+          </Stat>
+        </Box>
+        {/* Scheduled Appointments Card */}
+        <Box p={4} borderWidth="1px" borderRadius="lg" boxShadow="md">
+          <Stat>
+            <StatLabel>Scheduled Appointments</StatLabel>
+            <StatNumber>{scheduledAppointments}</StatNumber>
+          </Stat>
+        </Box>
+        {/* Patient List Card */}
+        <Box p={4} borderWidth="1px" borderRadius="lg" boxShadow="md">
+          <Heading size="md" mb={4}>Patient List</Heading>
+          {patientList.map(patient => (
+            <Box key={patient.id} mb={2}>
+              {patient.name}
+            </Box>
+          ))}
+        </Box>
+      </SimpleGrid>
+    </Flex>
+  );
+};
 
-     
-    </div>
-  )
-}
-
-export default AdminDashboard
+export default DoctorDashboard;

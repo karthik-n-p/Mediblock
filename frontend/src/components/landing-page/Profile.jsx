@@ -168,7 +168,7 @@ function Profile() {
           <Box position={'relative'} bg="bg" borderRadius={'30px'} p={'10px'} border='3px solid white' alignItems={'center'} justifyContent={'center'}>
             <Image src={'https://img.freepik.com/premium-psd/3d-flow-red-blood-cells-iron-platelets-realistic-medical-illustration-isolated-transparent-png-background_81863-9570.jpg'} alt="LandingPic" w={'200px'} />
             <HStack pos={'absolute'} bottom={'0px'} right={'0px'} left={'0px'} border={'3px solid white'} borderRadius={'30px'} p={'10px'} alignItems={'center'} justifyContent={'space-between'}>
-              <Text>My Blood</Text>
+              <Text>My Blood</Text>s
               <FaChevronCircleRight size={'20px'} />
             </HStack>
           </Box>

@@ -8,8 +8,8 @@ function Videochat() {
 
   useEffect(() => {
     const meeting = async () => {
-      const appID = 1775122648;
-      const serverSecret = "41e6f089a4f5f266318f15e1ac723ba9";
+      const appID = 1145816925;
+      const serverSecret = "e8fbdcfcdd9d2daa47f6246eaaf12cf1";
       const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
         appID,
         serverSecret,

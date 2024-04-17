@@ -54,17 +54,14 @@ const Sidebar = () => {
           <Box  width="60px" height="60px" borderRadius="40px" border='5px solid white'  display="flex" justifyContent="center" alignItems="center"  name='home'  bg={highlightedIcon === "Practice" ? "btng" : "bg"} >
             <MdCall  size="25px"  color={highlightedIcon === "Practice" ? "white" : "black"}/>
           </Box>
-         {isExpanded &&
-          <Text color={highlightedIcon === "Practice" ? "white" : "grey1"} fontSize="xl">
-            Practice
-          </Text>}
+        
         </HStack>
         </Link>
         
        
      
 
-        <Link  to={isadmin?'admincompetition':'/competition'}>
+        <Link  to={isadmin?'admincompetition':'/Upload'}>
         <HStack spacing="20px" p="" onClick={() => handleIconClick("Contest")}>
           <Box  width="60px" height="60px" borderRadius="40px" border='5px solid white'   display="flex" justifyContent="center" alignItems="center" name='Contest'  bg={highlightedIcon === "Contest" ? "btng" : "bg"} >
             <MdDescription color={highlightedIcon === "Contest" ? "white" : "black"} size="30px" />

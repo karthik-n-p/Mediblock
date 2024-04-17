@@ -1,166 +1,64 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Grid,
-  HStack,
-  Input,
-  Select,
-  Text,
-  VStack,
-  useToast,
-} from "@chakra-ui/react";
+import React, { useState, useEffect } from 'react';
+import { Grid, GridItem, Box, Text, Button, Heading } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { doc, setDoc } from "firebase/firestore";
-import { firestore } from '../UserPages/firebase-auth';
 
-const ClinicDashboard = () => {
-  const [name, setName] = useState("");
-  const [specialization, setSpecialization] = useState("");
-  const [availability, setAvailability] = useState(Array(7).fill(true));
-  const [institutionalEmail, setInstitutionalEmail] = useState("");
-  const [generatedPassword, setGeneratedPassword] = useState("");
-  const toast = useToast();
+function Clinic() {
+  const [clinic, setClinic] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleSubmit = async () => {
-    if (!name || !specialization || !institutionalEmail) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
+  useEffect(() => {
+    // Fetch clinic details from the backend
+    const uid = 'IgtjHPhxT1bJa3gqD7Qe4MYm7kj2'; // Replace with the actual UID
+    axios.get(`http://localhost:3000/clinics/${uid}`)
+      .then(response => {
+        setClinic(response.data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching clinic details:', error);
+        setLoading(false);
       });
-      return;
-    }
+  }, []);
 
-    try {
-      const createUserResponse = await axios.post('http://localhost:3000/create-user', { email: institutionalEmail , name: name });
-
-      if (createUserResponse.data.success) {
-        // Doctor creation successful, proceed to save details in Firestore
-        const doctorData = {
-          name,
-          specialization,
-          availability,
-          role: "doctor",
-        };
-
-        const saveDoctorResponse = await axios.post('http://localhost:3000/save-doctor', doctorData);
-
-        if (saveDoctorResponse.data.success) {
-          toast({
-            title: "Success",
-            description: "Doctor details added successfully",
-            status: "success",
-            duration: 3000,
-            isClosable: true,
-          });}
-
-
-
-
-        // Reset form fields after successful submission
-        setName("");
-        setSpecialization("");
-        setAvailability(Array(7).fill(true));
-        setInstitutionalEmail("");
-        
-        // Set the generated password to display to the user
-        setGeneratedPassword(createUserResponse.data.password);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to create doctor",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    } catch (error) {
-      console.error("Error adding doctor details:", error);
-      toast({
-        title: "Error",
-        description: "An error occurred while adding doctor details",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
+  const handleEdit = () => {
+    // Implement edit functionality
+    console.log('Edit clinic details');
   };
 
-  const handleDayToggle = (index) => {
-    const updatedAvailability = [...availability];
-    updatedAvailability[index] = !updatedAvailability[index];
-    setAvailability(updatedAvailability);
-  };
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <Box p={40} bg="#ECECEC">
-      <Text fontSize="xl" fontWeight="bold" mb={4}>
-        Clinic Dashboard
-      </Text>
-      <Grid templateColumns="1fr" gap={4}>
-        <FormControl>
-          <FormLabel>Name</FormLabel>
-          <Input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Specialization</FormLabel>
-          <Select
-            value={specialization}
-            onChange={(e) => setSpecialization(e.target.value)}
-          >
-            <option value="">Select specialization</option>
-            <option value="Cardiology">Cardiology</option>
-            <option value="Pediatrician">Pediatrics</option>
-            <option value="Dermatologist">Dermatology</option>
-          </Select>
-        </FormControl>
-        <FormControl>
-          <FormLabel>Institutional Email</FormLabel>
-          <Input
-            type="email"
-            value={institutionalEmail}
-            onChange={(e) => setInstitutionalEmail(e.target.value)}
-          />
-        </FormControl>
-        <Box>
-          <FormLabel>Availability</FormLabel>
-          <HStack align="start">
-            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => (
-              <Button
-                key={day}
-                colorScheme={availability[index] ? "blue" : "red"}
-                onClick={() => handleDayToggle(index)}
-              >
-                {day}
-              </Button>
-            ))}
-          </HStack>
+    <Grid templateColumns="repeat(4, 1fr)" gap={4} p={8}>
+      <GridItem colSpan={4} mb={8}>
+        <Box bg="gray.100" p={4} borderRadius="md" textAlign="center">
+          <Heading size="lg" mb={4}>Clinic Dashboard</Heading>
+          <Text fontSize="xl" fontWeight="bold">Welcome to {clinic.name}</Text>
+          <Text fontSize="md">Location: {clinic.location}</Text>
+          <Button mt={4} colorScheme="teal" onClick={handleEdit}>Edit Clinic</Button>
         </Box>
-        <Button
-          colorScheme="blue"
-          bg="#0080FF"
-          _hover={{ bg: "#0059b3" }}
-          onClick={handleSubmit}
-        >
-          Add Doctor
-        </Button>
-      </Grid>
-      {generatedPassword && (
-        <Text mt={4} fontWeight="bold">
-          Generated Password: {generatedPassword}
-        </Text>
-      )}
-    </Box>
+      </GridItem>
+      <GridItem colSpan={2}>
+        <Box bg="gray.100" p={4} borderRadius="md">
+          <Text fontSize="xl" fontWeight="bold" mb={2}>Other Features</Text>
+          <Text><b>Total Appointments:</b> {clinic.totalAppointments}</Text>
+          <Text><b>Total Online Appointments:</b> {clinic.totalOnlineAppointments}</Text>
+          <Text><b>Total Offline Appointments:</b> {clinic.totalOfflineAppointments}</Text>
+        </Box>
+      </GridItem>
+      <GridItem colSpan={2}>
+        <Box bg="gray.100" p={4} borderRadius="md">
+          <Text fontSize="xl" fontWeight="bold" mb={2}>Actions</Text>
+          <Text>Manage Doctors:</Text>
+          <Link to="/create-doctor">
+            <Button mt={2} colorScheme="teal">Add Doctor</Button>
+          </Link>
+        </Box>
+      </GridItem>
+    </Grid>
   );
-};
+}
 
-export default ClinicDashboard;
+export default Clinic;
