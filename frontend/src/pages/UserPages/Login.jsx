@@ -4,6 +4,8 @@ import { FaGoogle, FaGithub } from 'react-icons/fa';
 import { getAuth, signInWithEmailAndPassword,sendPasswordResetEmail,signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useNavigate,Link} from 'react-router-dom';
 import axios from 'axios';
+import { useContext } from 'react';
+import AuthContext from './AuthContext';
 
 
 
@@ -19,6 +21,8 @@ const LoginPage = ({ handleSignupSuccess }) => {
   const [resetPasswordMessage, setResetPasswordMessage] = React.useState('');
   const [isadmin, setIsadmin] = React.useState(false);
   const [userType, setUserType] = React.useState('');
+
+  const {isdoctor} = useContext(AuthContext);
 
 const checkAdmin = async (user) => {
    
@@ -38,13 +42,20 @@ const checkAdmin = async (user) => {
           navigate('/clinic')
 
       }
-      else{
-        console.log("user is not admin");
+      else if(isdoctor){
+        console.log("user is doctor");
         handleSignupSuccess(user,response.data.isAdmin)
+        navigate('/admin')
      
-        navigate('/')
+       
 
       }
+      else{
+        console.log("user is patient");
+        handleSignupSuccess(user,response.data.isAdmin)
+        navigate('/')
+      }
+
     }
     )
     .catch((error) => {

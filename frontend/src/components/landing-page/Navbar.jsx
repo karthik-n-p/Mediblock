@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Heading, Text, VStack, HStack, Divider,Image, Flex, Highlight } from '@chakra-ui/react';
-import { MdHome, MdForum, MdDescription, MdStar, MdFeedback, MdInfo, MdUpgrade, MdWork, MdMenu, } from 'react-icons/md';
+import { MdHome, MdForum, MdDescription, MdStar, MdFeedback, MdInfo, MdUpgrade, MdWork, MdMenu, MdAdd, } from 'react-icons/md';
 import { AiOutlineBulb } from 'react-icons/ai';
 import { IconButton } from '@chakra-ui/react'
 import Logo from '../../assets/logo.png';
@@ -24,6 +24,7 @@ const Sidebar = () => {
   const [highlightedIcon, setHighlightedIcon] = useState('home');
   const { isRegistered } = React.useContext(AuthContext);
   const {isadmin} = useContext(AuthContext);
+  const {isdoctor} = useContext(AuthContext);
 
   console.log("isadmin in sidebar",isadmin);
   const handleToggleExpand = () => {
@@ -37,7 +38,7 @@ const Sidebar = () => {
     <Box ml={'55px'} position={'relative'}   pos={'fixed'} display={isRegistered || isadmin ?'flex':'none'}  flexDirection={'column'}  top="0"  width={isExpanded ? '260px' : '20px'} height="120vh" zIndex={100000} alignItems={'center'} justifyContent={'center'} >
      
       <VStack display={'flex'} spacing="1px" alignItems={isExpanded ? 'left' : 'center'}  borderRadius={'20px'}   bg="white" flexDirection={'column'}  top="0"  width={isExpanded ? '260px' : '25px'} height="35vh" zIndex={100000} justifyContent={'space-between'}>
-      <Link to='/'>
+      <Link to={isadmin ? '/clinic' : (isdoctor ? '/admin' : '/')}>
         <HStack alignSelf={'flex-start'} spacing="20px" onClick={() => handleIconClick("home")}>
           <Box width="60px" height="60px" borderRadius="40px" border='5px solid white'  display="flex" justifyContent="center" alignItems="center" name='home'  bg={highlightedIcon === "home" ? "btng" : "#32313B"} >
             <FaHeartbeat  color={highlightedIcon === "home" ? "white" : "#A0AEC0"}   size="30px" />   
@@ -49,10 +50,11 @@ const Sidebar = () => {
         </Link>
         
        
-        <Link to='/practice'>
+        <Link to={isadmin?'/create-dr' :'/appointment'}>
         <HStack spacing="20px" p="" onClick={() => handleIconClick("Practice")}>
           <Box  width="60px" height="60px" borderRadius="40px" border='5px solid white'  display="flex" justifyContent="center" alignItems="center"  name='home'  bg={highlightedIcon === "Practice" ? "btng" : "bg"} >
-            <MdCall  size="25px"  color={highlightedIcon === "Practice" ? "white" : "black"}/>
+            {isadmin? <MdAdd  color={highlightedIcon === "Practice" ? "white" : "black"} size="30px" /> : <MdCall  color={highlightedIcon === "Practice" ? "white" : "black"} size="30px" />}
+         
           </Box>
         
         </HStack>
@@ -62,7 +64,7 @@ const Sidebar = () => {
      
 
         <Link  to={isadmin?'admincompetition':'/Upload'}>
-        <HStack spacing="20px" p="" onClick={() => handleIconClick("Contest")}>
+        <HStack  display={isadmin?'none':'block'} spacing="20px" p="" onClick={() => handleIconClick("Contest")}>
           <Box  width="60px" height="60px" borderRadius="40px" border='5px solid white'   display="flex" justifyContent="center" alignItems="center" name='Contest'  bg={highlightedIcon === "Contest" ? "btng" : "bg"} >
             <MdDescription color={highlightedIcon === "Contest" ? "white" : "black"} size="30px" />
           </Box>

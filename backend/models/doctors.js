@@ -11,6 +11,9 @@ const doctorSchema = new mongoose.Schema({
   role: String,
   clinicId: String,
   ClinicName: String,
+  experience: String,
+  description: String,
+  institutionalEmail: String,
 
   numberofAppointments: {
     type: Number,
@@ -24,12 +27,13 @@ const doctorSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  
 
   availability : [{
-    date: Date, // Date for which availability is specified
+   
     timeSlots: [{ 
-      startTime: String, 
-      endTime: String,
+      startTime:Date,
+      endTime: Date,
       availability: Boolean
     }]
   }],
@@ -38,7 +42,7 @@ const doctorSchema = new mongoose.Schema({
 appointment: [{ 
     patientId: String,
     patientName: String,
-    bookedSlot: [{ date : String, startTime: String, endTime: String }],
+    bookedSlot: [{  startTime: String, endTime: String }],
     status: String,
     meetingLink: String,
     mode: String,

@@ -301,7 +301,7 @@ const Clinic = require('./models/clinic');
 
     app.post('/save-doctor/:id', async (req, res) => {
       try {
-        const { name, specialization, availability } = req.body;
+        const { name, specialization, availability, description,experience, institutionalEmail } = req.body;
         const { id } = req.params;
         console.log("id",id);
 
@@ -324,9 +324,13 @@ const Clinic = require('./models/clinic');
           name,
           specialization,
           availability,
+          description,
+          institutionalEmail,
           clinicId: id,
           ClinicName: clinic.name,
           role: 'doctor',
+          experience,
+          experience,
           numberofAppointments,
           numberofofflineAppointments,
           numberofonlineAppointments,
@@ -340,6 +344,12 @@ const Clinic = require('./models/clinic');
         if (doctor){
           console.log("doctor created in mongodb database");
         }
+
+        // Update the clinic document to save the doctor's ID
+
+        clinic.doctors.push(doctor._id);
+        await clinic.save();
+
         
     
     
@@ -390,7 +400,7 @@ const Clinic = require('./models/clinic');
         }
     
         // Update the doctor's document to save patient details
-        doctor.appointments.push({ name: patientName, bookedSlot: bookedSlot, status: 'booked'});
+        doctor.appointment.push({ name: patientName, bookedSlot: bookedSlot, status: 'booked'});
   
         await doctor.save();
     
@@ -543,48 +553,56 @@ const Clinic = require('./models/clinic');
     //end point to create slot for doctor
     app.post('/create-slot', async (req, res) => {
       try {
-        const { doctorName, date, startTime, endTime } = req.body;
+        const { doctorName,startTime, endTime } = req.body;
+        console.log("doctorName",doctorName, "startTime",startTime, "endTime",endTime);
+
+
+        
     
         // Find the doctor document with the doctor name
         const doctor = await Doctor.findOne({ name: doctorName });
+        console.log("doctor",doctor);
+        
     
         if (!doctor) {
           return res.status(404).json({ success: false, error: 'Doctor not found' });
         }
-        console.log('Doctor:', doctor); 
-        // Check if the date already exists in the doctor's availability array
-        const existingDate = doctor.availability.find(slot => slot.date.toString() === new Date(date).toString());  
-        if (existingDate) {
-          // Check if the time slot already exists in the existing date
-          const existingSlot = existingDate.timeSlots.find(slot => slot.startTime === startTime && slot.endTime === endTime);
-          if (existingSlot) {
+        console.log("length of availability",doctor.availability.length);
+        for (let i = 0; i < doctor.availability.length ; i++) {
+          const timeSlot = doctor.availability[i].timeSlots[0]; // Assuming timeSlots is an array
+       
+          const startTime1 = new Date(timeSlot.startTime);
+          const endTime1 = new Date(timeSlot.endTime);
+
+
+          const startTime2 = new Date(startTime);
+          const endTime2 = new Date(endTime);
+
+          
+        
+          console.log("Start Time1:", startTime1, "start time2",startTime2);
+        // check wether the slot already exists
+
+          if (startTime1.getTime() === startTime2.getTime() && endTime1.getTime() === endTime2.getTime()) {
             return res.status(400).json({ success: false, error: 'Slot already exists' });
           }
+        
 
-          //if the date is from past then return the error
-          if (new Date(date) < new Date()) {
-            return res.status(400).json({ success: false, error: 'Cannot create slot for past date' });
+          //checks wether the slot clash with the existing slot that is start time is less than the existing end time and end time is greater than the existing start time 
+
+          if ((startTime2.getTime() < endTime1.getTime() && endTime2.getTime() > startTime1.getTime())  ) {
+            return res.status(400).json({ success: false, error: 'Slot clash with existing slot' });
           }
 
-          // Add the new time slot to the existing date after checking the time slot is not clashed with existing time slot
-          if(existingDate.timeSlots.length > 0){
-            for (let i = 0; i < existingDate.timeSlots.length; i++) {
-              if((startTime >= existingDate.timeSlots[i].startTime && startTime <= existingDate.timeSlots[i].endTime) || (endTime >= existingDate.timeSlots[i].startTime && endTime <= existingDate.timeSlots[i].endTime)){
-                return res.status(400).json({ success: false, error: 'Slot already exists' });
-              }
 
-  
-            }
-          }
-          existingDate.timeSlots.push({ startTime, endTime, availability: true });
-        } else {
-           //if the date is from past then return the error
-           if (new Date(date) < new Date()) {
-            return res.status(400).json({ success: false, error: 'Cannot create slot for past date' });
-          }
-          // Create a new date with the new time slot
-          doctor.availability.push({ date: new Date(date), timeSlots: [{ startTime, endTime, availability: true }] });
+
+        
         }
+        
+       
+          // Create a new date with the new time slot
+          doctor.availability.push({ timeSlots: [{ startTime, endTime, availability: true }] });
+        
     
         await doctor.save();
     
@@ -598,7 +616,7 @@ const Clinic = require('./models/clinic');
 
     // Endpoint to fetch available slots for a specific doctor from MongoDB
 
-    app.get('/slots/:doctorName', async (req, res) => {
+    app.get('/get-slots/:doctorName', async (req, res) => {
       try {
         const { doctorName } = req.params;
     
@@ -608,6 +626,21 @@ const Clinic = require('./models/clinic');
 
         if (!doctor) {
           return res.status(404).json({ success: false, error: 'Doctor not found' });
+        }
+
+        //set availability false if the slot time has already passed
+        for(let i = 0; i < doctor.availability.length; i++){
+          const timeSlot = doctor.availability[i].timeSlots;
+          for(let j = 0; j < timeSlot.length; j++){
+            const slot = timeSlot[j];
+            const startTime = new Date(slot.startTime);
+            const endTime = new Date(slot.endTime);
+            const currentDate = new Date();
+
+            if(currentDate.getTime() > startTime.getTime() || currentDate.getTime() > endTime.getTime()){
+              slot.availability = false;
+            }
+          }
         }
 
         res.status(200).json(doctor.availability);
@@ -623,7 +656,7 @@ const Clinic = require('./models/clinic');
 
     app.post('/remove-slot', async (req, res) => {
       try {
-        const { doctorName, date, startTime, endTime } = req.body;
+        const { doctorName, startTime, endTime } = req.body;
     
         // Find the doctor document with the doctor name
         const doctor = await Doctor.findOne
@@ -633,22 +666,23 @@ const Clinic = require('./models/clinic');
           return res.status(404).json({ success: false, error: 'Doctor not found' });
         }
 
-        // Find the date with the specified date
-        const existingDate = doctor.availability.find(slot => slot.date.toString() === new Date(date).toString());
+       
+     //if the start time and end time matches with the existing start time and end time then remove the slot
+     for (let i = 0; i < doctor.availability.length ; i++) {
+      const timeSlot = doctor.availability[i].timeSlots[0]; // Assuming timeSlots is an array
 
-        if (!existingDate) {
-          return res.status(404).json({ success: false, error: 'Date not found' });
-        }
+      const startTime1 = new Date(timeSlot.startTime);
+      const endTime1 = new Date(timeSlot.endTime);
 
-        // Find the time slot with the specified start and end times
-        const existingSlot = existingDate.timeSlots.find(slot => slot.startTime === startTime && slot.endTime === endTime);
 
-        if (!existingSlot) {
-          return res.status(404).json({ success: false, error: 'Slot not found' });
-        }
+      const startTime2 = new Date(startTime);
+      const endTime2 = new Date(endTime);
 
-        // Remove the time slot from the date
-        existingDate.timeSlots = existingDate.timeSlots.filter(slot => slot.startTime !== startTime && slot.endTime !== endTime);
+      if (startTime1.getTime() === startTime2.getTime() && endTime1.getTime() === endTime2.getTime()) {
+        doctor.availability.splice(i, 1);
+        break;
+      }
+    }
 
         await doctor.save();
 
@@ -660,7 +694,9 @@ const Clinic = require('./models/clinic');
       }
 
     }
+
     );
+
 
 
 
@@ -670,62 +706,75 @@ const Clinic = require('./models/clinic');
 
       try {
 
-        const { doctorName, date, startTime, endTime, patientName, mode ,meetingLink } = req.body;
+        let { doctorName, startTime, endTime, patientName, mode ,meetingLink } = req.body;
+        console.log("doctorName",doctorName, "startTime",startTime, "endTime",endTime, "patientName",patientName, "mode",mode, "meetingLink",meetingLink)
 
+        
+        
         // Find the doctor document with the doctor name
 
-        const doctor = await Doctor.findOne({ name: doctorName });
+        const doctor = await Doctor.findOne
+        ({ name: doctorName });
 
         if (!doctor) {
           return res.status(404).json({ success: false, error: 'Doctor not found' });
         }
 
-        // Find the date with the specified date
+        // Find the patient document with the patient name
 
-        const existingDate = doctor.availability.find(slot => slot.date.toString() === new Date(date).toString());
+        const patient = await Patient
+        .findOne({ name: patientName });
 
-        if (!existingDate) {
+        if (!patient) {
+          return res.status(404).json({ success: false, error: 'Patient not found' });
+        }
 
-          return res.status(404).json({ success: false, error: 'Date not found' });
+         // Find the date with the specified start and end times
 
+         for (let i = 0; i < doctor.availability.length ; i++) {  
+          const timeSlot = doctor.availability[i].timeSlots; // Assuming timeSlots is an array
+       
+
+          for(let j = 0; j < timeSlot.length; j++){
+            const slot = timeSlot[j];
+        
+            const startTime1 = new Date(slot.startTime).toLocaleString();
+            console.log("startTime1",startTime1);
+            const endTime1 = new Date(slot.endTime).toLocaleString();
+            console.log("endTime1",endTime1);
+
+            const startTime2 = new Date(startTime).toLocaleString();
+            console.log("startTime2",startTime2);
+            const endTime2 = new Date(endTime).toLocaleString();
+            console.log("endTime2",endTime2);
+
+            if (startTime1 === startTime2 && endTime1 === endTime2) {
+              console.log("slot available",slot.availability);
+              if (!slot.availability) {
+                return res.status(400).json({ success: false, error: 'Slot is not available' });
+              }
+              slot.availability = false;
+              break;
+            }
+          }
         }
 
 
-        // Find the time slot with the specified start and end times
-
-
-        const existingSlot = existingDate.timeSlots.find(slot => slot.startTime === startTime && slot.endTime === endTime);
-
-        if (!existingSlot) {
-            
-            return res.status(404).json({ success: false, error: 'Slot not found' });
-  
-          }
-
-          // Check if the slot is already booked
-
-          if (!existingSlot.availability) {
-            return res.status(400).json({ success: false, error: 'Slot already booked' });
-          }
-
-          // Update the slot to mark it as booked
-
-          existingSlot.availability = false;
-
-          //upate the number of appointments for the doctor
-
-          doctor.numberofAppointments = doctor. numberofAppointments + 1;
+        
 
 
 
-          const patient = await Patient
-          .findOne({ name: patientName });
 
-          console.log("patient",patient);
 
-          if (!patient) {
-            return res.status(404).json({ success: false, error: 'Patient not found' });
-          }
+        
+
+
+
+      
+
+
+
+
 
           // Update the doctor's document to save patient details 
 
@@ -742,8 +791,8 @@ const Clinic = require('./models/clinic');
           //upate the number of online appointments for the doctor
           doctor.numberofonlineAppointments = doctor. numberofonlineAppointments + 1;
 
-          doctor.appointment.push({ patientName, bookedSlot: { date, startTime, endTime }, status: 'booked', mode: 'online', meetingLink });
-          patient.appointments.push({ doctorName, bookedSlot: { date, startTime, endTime }, status: 'booked', mode: 'online', meetingLink });
+          doctor.appointment.push({ patientName, bookedSlot: {  startTime, endTime }, status: 'booked', mode: 'online', meetingLink });
+          patient.appointments.push({ doctorName, bookedSlot: {  startTime, endTime }, status: 'booked', mode: 'online', meetingLink });
 
           }
           else{
@@ -1024,6 +1073,285 @@ const Clinic = require('./models/clinic');
         }
 
       );
+
+
+    //endpoint to remove doctor from clinic and remove mail from firebase
+
+    app.delete('/remove-doctors/:doctorId', async (req, res) => {
+
+      try {
+          
+          const { doctorId } = req.params;
+
+          
+  
+          // Find the doctor document with the doctor ID
+          
+          const doctor = await Doctor.findOne({ _id: doctorId });
+
+          
+
+
+
+          if (!doctor) {
+            return res.status(404).json({ success: false, error: 'Doctor not found' });
+          }
+
+          // Find the clinic document with the clinic ID
+
+          const clinic = await Clinic.findOne({email: doctor.email});
+
+          if (!clinic) {
+            return res.status(404).json({ success: false, error: 'Clinic not found' });
+          }
+
+          // Remove the doctor from the clinic
+
+          clinic.doctors = clinic.doctors.filter(doc => doc.toString() !== doctorId);
+
+          await clinic.save();
+
+          // Delete the doctor document
+
+          await Doctor.deleteOne({ _id: doctorId });
+
+
+
+
+          // Delete the doctor from firebase
+          console.log('doctor.institutionalEmail', );
+
+          admin.auth().getUserByEmail(doctor.institutionalEmail)
+          .then((userRecord) => {
+            // User found, delete user
+            return admin.auth().deleteUser(userRecord.uid);
+          })
+          .then(() => {
+            console.log(`Successfully deleted user with email: ${email}`);
+          })
+          .catch((error) => {
+            console.error('Error deleting user:', error);
+          });
+
+          res.status(200).json({ success: true });
+
+
+      } catch (error) {
+
+          console.error('Error removing doctor:', error);
+
+          res.status(500).json({ success: false, error: 'Failed to remove doctor' });
+
+      }
+
+    }
+      
+      );
+
+
+      //endpoint to retrieve past appointments for a specific doctor from MongoDB
+
+      app.get('/past-appointments/:doctorName', async (req, res) => {
+
+        try {
+
+          const { doctorName } = req.params;
+
+          // Find the doctor document with the doctor name
+
+          const doctor = await Doctor.findOne({ name: doctorName });
+
+          if (!doctor) {
+            return res.status(404).json({ success: false, error: 'Doctor not found' });
+          }
+            
+
+          const currentDate = new Date();
+
+          const pastAppointmetns =[ ];
+
+          const FutureAppiontments = [];
+
+          const LiveAppointments = [];
+
+          for (let i = 0; i < doctor.appointment.length ; i++) {  
+            const timeSlot = doctor.appointment[i].bookedSlot; // Assuming timeSlots is an array
+            console.log("timeSlot",doctor.appointment[i]);
+         
+  
+            for(let j = 0; j < timeSlot.length; j++){
+              const slot = timeSlot[j];
+          
+              const startTime1 = new Date(slot.startTime);
+              console.log("startTime1",startTime1);
+              const endTime1 = new Date(slot.endTime);
+              console.log("endTime1",endTime1);
+
+              if (currentDate.getTime()>endTime1.getTime()) {
+                //if slot is already present in the past appointment then continue
+                if(pastAppointmetns.includes(slot)){
+                  continue;
+                }
+                else{
+                  //also push the current 
+                  pastAppointmetns.push(slot);
+
+                  if(pastAppointmetns.includes(doctor.appointment[i].patientName) && pastAppointmetns.includes(doctor.appointment[i].mode) && pastAppointmetns.includes(doctor.appointment[i].meetingLink)){
+                    continue;
+                  }
+                  else{
+                  pastAppointmetns.push(doctor.appointment[i].patientName);
+                  pastAppointmetns.push(doctor.appointment[i].mode);
+                  pastAppointmetns.push(doctor.appointment[i].meetingLink);
+
+
+                }
+              }
+                
+              }
+
+              else if(currentDate.getTime() < startTime1.getTime() && currentDate.getTime() < endTime1.getTime()){
+                if(FutureAppiontments.includes(slot)){
+                  break;
+                }
+                else{
+                  //also push other details in the future appointment like patient name, meeting link , mode of appointment only once 
+                  FutureAppiontments.push(slot);
+                  if(FutureAppiontments.includes(doctor.appointment[i].patientName) && FutureAppiontments.includes(doctor.appointment[i].mode) && FutureAppiontments.includes(doctor.appointment[i].meetingLink)){
+                    continue;
+                  }
+                  else{
+                  FutureAppiontments.push(Name = doctor.appointment[i].patientName);
+                  FutureAppiontments.push(Mode =doctor.appointment[i].mode);
+                  FutureAppiontments.push(meetingLink = doctor.appointment[i].meetingLink);
+                  }
+                  
+
+                }
+             
+              }
+
+              else if(currentDate.getTime() > startTime1.getTime() && currentDate.getTime() < endTime1.getTime()){
+                if(LiveAppointments.includes(slot)){
+                  continue;
+                }
+                else{
+                  LiveAppointments.push(slot);
+                  if(LiveAppointments.includes(doctor.appointment[i].patientName) && LiveAppointments.includes(doctor.appointment[i].mode) && LiveAppointments.includes(doctor.appointment[i].meetingLink)){
+                    continue;
+                  }
+                  else{
+                 
+                  LiveAppointments.push(doctor.appointment[i].patientName);
+                  LiveAppointments.push(doctor.appointment[i].mode);
+                  LiveAppointments.push(doctor.appointment[i].meetingLink);
+
+                  }
+                  
+
+                  
+                  
+                }
+               
+              }
+
+            }
+            
+
+          
+
+          } 
+          console.log("pastAppointmetns",pastAppointmetns);
+          console.log("FutureAppiontments",FutureAppiontments);
+          console.log("LiveAppointments",LiveAppointments);
+
+          //create a key value pair for past, future and live appointments
+
+          const allAppointments = {
+            pastAppointmetns,
+            FutureAppiontments,
+            LiveAppointments
+          };
+
+          console.log("allAppointments",allAppointments);
+
+          //return the key value pair
+          res.status(200).json(allAppointments);
+
+
+
+       
+
+
+         
+
+        } catch (error) {
+              
+                console.error('Error fetching past appointments:', error);
+    
+                res.status(500).json({ error: 'Failed to fetch past appointments' });
+    
+              }
+
+      }
+
+    );
+
+
+
+       
+
+
+      //endpoint to retrieve upcoming appointments for a specific doctor from MongoDB
+
+      app.get('/upcoming-appointments/:doctorName', async (req, res) => {
+          
+          try {
+  
+            const { doctorName } = req.params;
+  
+            // Find the doctor document with the doctor name
+  
+            const doctor = await Doctor.findOne({ name: doctorName });
+
+            if (!doctor) {
+              return res.status(404).json({ success: false, error: 'Doctor not found' });
+            }
+
+            // Filter the doctor's appointments to only include upcoming appointments
+            const formatDate = (date) => {
+              const d = new Date(date);
+              const day = d.getDate().toString().padStart(2, '0');
+              const month = (d.getMonth() + 1).toString().padStart(2, '0');
+              const year = d.getFullYear().toString().slice(-2);
+              return `${day}-${month}-${year}`;
+            };
+    
+
+            const upcomingAppointments = doctor.appointment.filter(appointment => new Date(formatDate(appointment.bookedSlot.date)) >= new Date());
+
+            res.status(200).json(upcomingAppointments);
+
+          } catch (error) {
+                
+                console.error('Error fetching upcoming appointments:', error);
+    
+                res.status(500).json({ error: 'Failed to fetch upcoming appointments' });
+    
+              }
+
+        }
+
+  
+        );
+
+               
+
+
+
+
+
+
 
 
         

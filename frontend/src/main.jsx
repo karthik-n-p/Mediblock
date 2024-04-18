@@ -7,6 +7,7 @@ import AuthContext from './pages/UserPages/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, firestore } from './pages/UserPages/firebase-auth';
 
+
 import QuestionPage from './pages/UserPages/Upload';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react'; // Import ChakraProvider and extendTheme
 import Landing from './pages/UserPages/Landing';
@@ -28,8 +29,9 @@ import BookSlot from './pages/UserPages/BookSlot';
 
 import Upload from './pages/UserPages/Upload';
 import axios from 'axios';
-import CreateDr from './pages/Clinincs/Clinic';
+import CreateDr from './pages/Clinincs/CreateDr';
 import Clinic from './pages/Clinincs/Clinic';
+import ClinicDrProfile from './pages/Clinincs/ClinicDrProfile';
 // Create a custom theme with the desired default color mode (dark)
 const customTheme = extendTheme({
   fonts: {
@@ -58,6 +60,7 @@ const App = () => {
   const [username, setUsername] = useState('');
   const [isadmin, setIsadmin] = useState(false);
   const [isdoctor, setIsdoctor] = useState(false);
+
 
   
   useEffect(() => {
@@ -96,6 +99,7 @@ const App = () => {
             console.log("user data of doctor ",user);
     
             localStorage.setItem('authData', JSON.stringify({ username: user.displayName , isdoctor: isdoctor, isadmin: isAdmin}));
+       
    
         }
         else{
@@ -167,16 +171,18 @@ const App = () => {
               <Route path="/login" element={<LoginPage handleSignupSuccess={handleSignupSuccess} />} />
               <Route path="/signup" element={<SignUpPage handleSignupSuccess={handleSignupSuccess} />} />
        
-              <Route path="/practice" element={<PracQues />} />
+              <Route path="/appointment" element={<PracQues />} />
            
-              <Route path="/admin" element={isadmin ? <DoctorDashboard /> : <Unauthorized />} />
+              <Route path="/admin" element={isdoctor ? <DoctorDashboard /> : <Unauthorized />} />
               <Route path="/create-dr" element={<CreateDr />} />
               <Route path="/clinic" element={<Clinic/>} />
               <Route path='/Upload' element={<Upload />} />
               <Route path='/doctordashboard' element={<DoctorDashboard />} />
               <Route path='/bookslot/:name' element={<BookSlot/>}/>
-              <Route path="/resource" element={<ResourcePage />} />
-              <Route path="/admin" element={isadmin ? <DoctorDashboard1 /> : <Unauthorized />} />
+
+              <Route path="/view-doctor/:name" element={<ClinicDrProfile/>} />
+             
+            
               <Route path="/clinic" element={<ClinicDashboard />} />
                    </Routes>
           </ChakraProvider>

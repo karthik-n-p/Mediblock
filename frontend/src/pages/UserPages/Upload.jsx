@@ -25,47 +25,52 @@ const PatientModule = () => {
 
   //if uid is null then set it to ''
   
-  const uid = auth.currentUser.uid || localStorage.getItem('uid');
+  const uid = auth.currentUser ? auth.currentUser.uid : localStorage.getItem('uid') || '';
 
+  // Rest of the code remains the same
+  
 const { username } = React.useContext(AuthContext);
   console.log("username",username); 
   console.log("uid",uid);
-
   useEffect(() => {
-    // Fetch list of doctors from the backend
-    axios.get('http://localhost:3000/doctors')
-      .then(response => {
-        setDoctors(response.data);
-       
-        console.log("doctors",response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching doctors:', error);
-      });
-
+    const fetchData = () => {
+      // Fetch list of doctors from the backend
+      axios.get('http://localhost:3000/doctors')
+        .then(response => {
+          setDoctors(response.data);
+          console.log("doctors",response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching doctors:', error);
+        });
+  
       // Fetch shared files for doctor from the backend
-
       axios.get(`http://localhost:3000/shared-documents/${username}`)
-      .then(response => {
-
-        setDrdocs(response.data);
-        console.log("uploaded files inside dr",response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching files:', error);
-      });
-
-
-    // Fetch previously uploaded files from the backend
-    axios.get(`http://localhost:3000/files/${uid}`)
-      .then(response => {
-        setUploadedFiles(response.data);
-        console.log("uploaded files ",response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching files:', error);
-      });
-  }, []);
+        .then(response => {
+          setDrdocs(response.data);
+          console.log("uploaded files inside dr",response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching files:', error);
+        });
+  
+      // Fetch previously uploaded files from the backend
+      axios.get(`http://localhost:3000/files/${uid}`)
+        .then(response => {
+          setUploadedFiles(response.data);
+          console.log("uploaded files ",response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching files:', error);
+        });
+    };
+  
+    const fetchDataInterval = setInterval(fetchData, 2000);
+  
+    // Cleanup function to clear the interval
+    return () => clearInterval(fetchDataInterval);
+  }, [uploadedFiles]);
+  
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -174,7 +179,7 @@ const { username } = React.useContext(AuthContext);
   uploadedFiles.map(file => (
     <GridItem key={file.id}>
        <MdInsertDriveFile size={32} /> 
-      <Text>{file.metadata.name}</Text>
+       <Text>{file.metadata && file.metadata.name}</Text> {/* Add null check */}
       <Button onClick={() => window.open(`https://ipfs.io/ipfs/${file.ipfs_pin_hash}`, '_blank')}>View</Button>
 
      
