@@ -32,28 +32,6 @@ const PatientCard = ({pastAppointment, futureAppointment,liveAppointment,  consu
 
 
 
-
-  
-
-
-
-
-
- 
-    
-   
-
-
-
-   
-  
-
-
-
-
-
- 
-
   return (
     <>
     <VStack gap={'10px'} display={'flex'} alignItems={'left'} justifyContent={'left'} spacing={2} bg="bg" p={4} borderRadius="md" >
@@ -68,9 +46,7 @@ const PatientCard = ({pastAppointment, futureAppointment,liveAppointment,  consu
       <Text fontSize="sm">Time: {appointment[0].startTime}</Text>
       <Text fontSize="sm">Mode: {appointment[2]}</Text>
      {appointment[2] === "online" && <Button onClick={() => consult(appointment[3])} colorScheme="teal">Consult</Button>}
-    
-
-
+ 
     </Box>
   ))
 )}
@@ -107,16 +83,13 @@ const PatientCard = ({pastAppointment, futureAppointment,liveAppointment,  consu
   ))
 )}
 </HStack>
-
-
-
-     
-
-        
+       
       </VStack>
     </>
   );
 };
+
+
 
 
 

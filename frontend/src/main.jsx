@@ -32,6 +32,7 @@ import axios from 'axios';
 import CreateDr from './pages/Clinincs/CreateDr';
 import Clinic from './pages/Clinincs/Clinic';
 import ClinicDrProfile from './pages/Clinincs/ClinicDrProfile';
+import PatientAppointment from './pages/UserPages/PatientAppointment';
 // Create a custom theme with the desired default color mode (dark)
 const customTheme = extendTheme({
   fonts: {
@@ -181,6 +182,8 @@ const App = () => {
               <Route path='/bookslot/:name' element={<BookSlot/>}/>
 
               <Route path="/view-doctor/:name" element={<ClinicDrProfile/>} />
+
+              <Route path='/booked-appointment/:name' element={<PatientAppointment/>} />
              
             
               <Route path="/clinic" element={<ClinicDashboard />} />

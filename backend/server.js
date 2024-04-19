@@ -1298,54 +1298,151 @@ const Clinic = require('./models/clinic');
     );
 
 
+    // Endpoint to fetch past,present,live appointments for a specific patient from MongoDB as above
 
-       
+    app.get('/past-appointments-patient/:patientName', async (req, res) => {
+        
+        try {
+  
+          const { patientName } = req.params;
+  
+          // Find the patient document with the patient name
+  
+          const patient = await Patient
+          .findOne({ name: patientName });
 
 
-      //endpoint to retrieve upcoming appointments for a specific doctor from MongoDB
+          if (!patient) {
+            return res.status(404).json({ success: false, error: 'Patient not found' });
+          }
 
-      app.get('/upcoming-appointments/:doctorName', async (req, res) => {
+          const currentDate = new Date();
+
+          const pastAppointmetns =[ ];
+          const FutureAppiontments = [];
+          const LiveAppointments = [];
+
+          for (let i = 0; i < patient.appointments.length ; i++) {
+            const timeSlot = patient.appointments[i].bookedSlot; // Assuming timeSlots is an array
+            console.log("timeSlot",patient.appointments[i]);
+         
+            for(let j = 0; j < timeSlot.length; j++){
+              const slot = timeSlot[j];
           
-          try {
-  
-            const { doctorName } = req.params;
-  
-            // Find the doctor document with the doctor name
-  
-            const doctor = await Doctor.findOne({ name: doctorName });
+              const startTime1 = new Date(slot.startTime);
+              console.log("startTime1",startTime1);
+              const endTime1 = new Date(slot.endTime);
+              console.log("endTime1",endTime1);
 
-            if (!doctor) {
-              return res.status(404).json({ success: false, error: 'Doctor not found' });
-            }
+              if (currentDate.getTime()>endTime1.getTime()) {
+                //if slot is already present in the past appointment then continue
+                if(pastAppointmetns.includes(slot)){
+                  continue;
+                }
+                else{
+                  //also push the current 
+                  pastAppointmetns.push(slot);
 
-            // Filter the doctor's appointments to only include upcoming appointments
-            const formatDate = (date) => {
-              const d = new Date(date);
-              const day = d.getDate().toString().padStart(2, '0');
-              const month = (d.getMonth() + 1).toString().padStart(2, '0');
-              const year = d.getFullYear().toString().slice(-2);
-              return `${day}-${month}-${year}`;
-            };
-    
+                  if(pastAppointmetns.includes(patient.appointments[i].doctorName) && pastAppointmetns.includes(patient.appointments[i].mode) && pastAppointmetns.includes(patient.appointments[i].meetingLink)){
+                    continue;
+                  }
+                  else{
+                  pastAppointmetns.push(patient.appointments[i].doctorName);
+                  pastAppointmetns.push(patient.appointments[i].mode);
+                  pastAppointmetns.push(patient.appointments[i].meetingLink);
 
-            const upcomingAppointments = doctor.appointment.filter(appointment => new Date(formatDate(appointment.bookedSlot.date)) >= new Date());
 
-            res.status(200).json(upcomingAppointments);
-
-          } catch (error) {
+                }
+              }
                 
-                console.error('Error fetching upcoming appointments:', error);
-    
-                res.status(500).json({ error: 'Failed to fetch upcoming appointments' });
-    
               }
 
-        }
+              else if(currentDate.getTime() < startTime1.getTime() && currentDate.getTime() < endTime1.getTime()){
+                if(FutureAppiontments.includes(slot)){
+                  break;
+                }
+                else{
+                  //also push other details in the future appointment like patient name, meeting link , mode of appointment only once 
+                  FutureAppiontments.push(slot);
+                  if(FutureAppiontments.includes(patient.appointments[i].doctorName) && FutureAppiontments.includes(patient.appointments[i].mode) && FutureAppiontments.includes(patient.appointments[i].meetingLink)){
+                    continue;
+                  }
+                  else{
+                  FutureAppiontments.push(Name = patient.appointments[i].doctorName);
+                  FutureAppiontments.push(Mode =patient.appointments[i].mode);
+                  FutureAppiontments.push(meetingLink = patient.appointments[i].meetingLink);
+                  }
+                  
 
-  
-        );
+                }
+             
+              }
 
+              else if(currentDate.getTime() > startTime1.getTime() && currentDate.getTime() < endTime1.getTime()){
+                if(LiveAppointments.includes(slot)){
+                  continue;
+                }
+                else{
+                  LiveAppointments.push(slot);
+                  if(LiveAppointments.includes(patient.appointments[i].doctorName) && LiveAppointments.includes(patient.appointments[i].mode) && LiveAppointments.includes(patient.appointments[i].meetingLink)){
+                    continue;
+                  }
+                  else{
+                 
+                  LiveAppointments.push(patient.appointments[i].doctorName);
+                  LiveAppointments.push(patient.appointments[i].mode);
+                  LiveAppointments.push(patient.appointments[i].meetingLink);
+
+                  }
+                  
+
+                  
+                  
+                }
                
+              }
+
+            }
+
+
+          }
+
+          console.log("pastAppointmetns",pastAppointmetns);
+          console.log("FutureAppiontments",FutureAppiontments);
+          console.log("LiveAppointments",LiveAppointments);
+
+          //create a key value pair for past, future and live appointments
+
+          const allAppointments = {
+            pastAppointmetns,
+            FutureAppiontments,
+            LiveAppointments
+          };
+
+          console.log("allAppointments",allAppointments);
+
+          //return the key value pair
+
+          res.status(200).json(allAppointments);
+
+        } catch (error) {
+                
+                console.error('Error fetching past appointments:', error);
+    
+                res.status(500).json({ error: 'Failed to fetch past appointments' });
+    
+              } 
+
+    }
+      
+      );
+
+
+
+
+
+
+       
 
 
 

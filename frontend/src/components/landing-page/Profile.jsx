@@ -142,10 +142,12 @@ function Profile() {
                 <Image src={Doctor} alt="LandingPic" w={'200px'} />
                 <Text>Dr.Sita Ram</Text>
               </HStack>
+              <Link to={`/booked-appointment/${username}`}>
               <Button alignSelf={'flex-start'} justifyContent={'space-between'} w="200px" h="40px" color="white" bg="btng" onClick={() => navigate('/profile')}>
                 <Text>View All</Text>
                 <FaChevronRight size={'20px'} />
               </Button>
+              </Link>
             </VStack>
           </VStack>
         </HStack>

@@ -24,7 +24,7 @@ const Sidebar = () => {
   const [highlightedIcon, setHighlightedIcon] = useState('home');
   const { isRegistered } = React.useContext(AuthContext);
   const {isadmin} = useContext(AuthContext);
-  const {isdoctor} = useContext(AuthContext);
+  const {isdoctor ,username} = useContext(AuthContext);
 
   console.log("isadmin in sidebar",isadmin);
   const handleToggleExpand = () => {
@@ -74,8 +74,8 @@ const Sidebar = () => {
           </Text>}
         </HStack>
         </Link>
-        {!isadmin && 
-        <Link to='/resource'>
+        {!isadmin && isdoctor && 
+        <Link to={`/booked-appointment/${username}`}>
         <HStack spacing="20px" p="" onClick={() => handleIconClick("Resources")}>
           <Box  width="60px" height="60px" borderRadius="40px" border='5px solid white'  name='Resources'  bg={highlightedIcon === "Resources" ? "btng" : "bg"}   display="flex" justifyContent="center" alignItems="center">
             <FaUserCircle color={highlightedIcon === "Resources" ? "white" : "black"} size="30px" />
