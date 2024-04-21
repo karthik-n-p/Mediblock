@@ -24,6 +24,11 @@ const patientSchema = new mongoose.Schema({
   }],
   
   files: [[fileSchema]], // Array of arrays of files
+
+  sharedFiles: [{
+    doctorName: String,
+   
+  }],
 });
 
 const Patient = mongoose.model('Patient', patientSchema);

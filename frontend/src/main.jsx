@@ -167,14 +167,14 @@ const App = () => {
               <Header />
             </div>
             <Routes>
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={isdoctor ? <DoctorDashboard /> :<Landing />} />
           <Route path="/room/:roomId" element={<Videochat />} />
               <Route path="/login" element={<LoginPage handleSignupSuccess={handleSignupSuccess} />} />
               <Route path="/signup" element={<SignUpPage handleSignupSuccess={handleSignupSuccess} />} />
        
               <Route path="/appointment" element={<PracQues />} />
-           
-              <Route path="/admin" element={isdoctor ? <DoctorDashboard /> : <Unauthorized />} />
+{/*            
+              <Route path="/admin" element={isdoctor ? <DoctorDashboard /> : <Unauthorized />} /> */}
               <Route path="/create-dr" element={<CreateDr />} />
               <Route path="/clinic" element={<Clinic/>} />
               <Route path='/Upload' element={<Upload />} />

@@ -50,7 +50,7 @@ appointment: [{
 
 
   sharedDocuments: [{ 
-    patientId: String,
+    patientName: String,
     files: [{ 
       filename: String,
       fileSize: Number,

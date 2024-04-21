@@ -38,7 +38,7 @@ const Sidebar = () => {
     <Box ml={'55px'} position={'relative'}   pos={'fixed'} display={isRegistered || isadmin ?'flex':'none'}  flexDirection={'column'}  top="0"  width={isExpanded ? '260px' : '20px'} height="120vh" zIndex={100000} alignItems={'center'} justifyContent={'center'} >
      
       <VStack display={'flex'} spacing="1px" alignItems={isExpanded ? 'left' : 'center'}  borderRadius={'20px'}   bg="white" flexDirection={'column'}  top="0"  width={isExpanded ? '260px' : '25px'} height="35vh" zIndex={100000} justifyContent={'space-between'}>
-      <Link to={isadmin ? '/clinic' : (isdoctor ? '/admin' : '/')}>
+      <Link to={isadmin ? '/clinic' :  '/'}>
         <HStack alignSelf={'flex-start'} spacing="20px" onClick={() => handleIconClick("home")}>
           <Box width="60px" height="60px" borderRadius="40px" border='5px solid white'  display="flex" justifyContent="center" alignItems="center" name='home'  bg={highlightedIcon === "home" ? "btng" : "#32313B"} >
             <FaHeartbeat  color={highlightedIcon === "home" ? "white" : "#A0AEC0"}   size="30px" />   
@@ -74,7 +74,7 @@ const Sidebar = () => {
           </Text>}
         </HStack>
         </Link>
-        {!isadmin && isdoctor && 
+        {!isadmin && !isdoctor && 
         <Link to={`/booked-appointment/${username}`}>
         <HStack spacing="20px" p="" onClick={() => handleIconClick("Resources")}>
           <Box  width="60px" height="60px" borderRadius="40px" border='5px solid white'  name='Resources'  bg={highlightedIcon === "Resources" ? "btng" : "bg"}   display="flex" justifyContent="center" alignItems="center">
@@ -89,25 +89,7 @@ const Sidebar = () => {
         }
        
       </VStack>
-      {!isadmin &&<>
-    
       
-      <VStack spacing="10" alignItems={isExpanded?"left":'center'} p="35px">
-      
-
-        <HStack spacing="20px" p="" onClick={() => handleIconClick("About")}>
-          <Box width="60px" height="60px" borderRadius="40px" border='5px solid white'   name='About'  bg={highlightedIcon === "About" ? "btng" : "bg"}  display="flex" justifyContent="center" alignItems="center">
-            <MdInfo  color="black" size="30px" />
-          </Box>
-       {isExpanded &&
-          <Text color="grey1" fontSize="xl">
-            About
-          </Text>}
-        </HStack>
-
-        </VStack>
-        </>
-}
        
     </Box>
 

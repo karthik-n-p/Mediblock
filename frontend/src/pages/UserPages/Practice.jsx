@@ -42,8 +42,9 @@ const PatientCard = ({pastAppointment, futureAppointment,liveAppointment,  consu
 ) : (
   liveAppointment.map((appointment) => (
     <Box key={appointment.patientId} borderRadius="sm" overflow="hidden" bg={'whiteAlpha.200'} boxShadow="md" p={4} >
-      <Text fontSize="sm">{appointment[1]}</Text>
-      <Text fontSize="sm">Time: {appointment[0].startTime}</Text>
+      <Text fontSize="sm">Name: {appointment[1]}</Text>
+      <Text fontSize="sm">Date: {new Date(appointment[0].startTime).toLocaleDateString()}</Text>
+      <Text fontSize="sm">Time: {new Date(appointment[0].startTime).toLocaleTimeString()}</Text>
       <Text fontSize="sm">Mode: {appointment[2]}</Text>
      {appointment[2] === "online" && <Button onClick={() => consult(appointment[3])} colorScheme="teal">Consult</Button>}
  
@@ -59,8 +60,10 @@ const PatientCard = ({pastAppointment, futureAppointment,liveAppointment,  consu
 ) : (
   futureAppointment.map((appointment) => (
     <Box key={appointment.patientId} borderRadius="sm" overflow="hidden"  bg={'whiteAlpha.200'} boxShadow="md" p={4} >
-      <Text fontSize="sm">{appointment[1]}</Text>
-      <Text fontSize="sm">Time: {new Date(appointment[0].startTime).toLocaleString()}</Text>
+    <Text fontSize="sm">Name: {appointment[1]}</Text>
+      <Text fontSize="sm">Date: {new Date(appointment[0].startTime).toLocaleDateString()}</Text>
+      <Text fontSize="sm">Time: {new Date(appointment[0].startTime).toLocaleTimeString()}</Text>
+      <Text fontSize="sm">Mode: {appointment[2]}</Text>
      
     </Box>
   ))
@@ -76,9 +79,11 @@ const PatientCard = ({pastAppointment, futureAppointment,liveAppointment,  consu
 ) : (
   pastAppointment.map((appointment) => (
     <Box key={appointment.patientId} borderRadius="sm" overflow="hidden"  bg={'whiteAlpha.200'} boxShadow="md" p={4} >
-      <Text fontSize="sm">{appointment[1]}</Text>
-      <Text fontSize="sm">Time: {appointment[0].startTime}</Text>
-      <Button onClick={() => consult(appointment.patientId)} colorScheme="teal">Consult</Button>
+      <Text fontSize="sm">Name: {appointment[1]}</Text>
+      <Text fontSize="sm">Date: {new Date(appointment[0].startTime).toLocaleDateString()}</Text>
+      <Text fontSize="sm">Time: {new Date(appointment[0].startTime).toLocaleTimeString()}</Text>
+      <Text fontSize="sm">Mode: {appointment[2]}</Text>
+    
     </Box>
   ))
 )}

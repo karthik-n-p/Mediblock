@@ -9,6 +9,7 @@ import {
   Grid,
   GridItem,
   Select,
+  HStack,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { auth } from './firebase-auth';
@@ -22,6 +23,8 @@ const PatientModule = () => {
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [doctors, setDoctors] = useState([]);
   const {isdoctor} = React.useContext(AuthContext);
+
+  const [sharedDoctors, setSharedDoctors] = useState([]);
 
   //if uid is null then set it to ''
   
@@ -43,6 +46,19 @@ const { username } = React.useContext(AuthContext);
         .catch(error => {
           console.error('Error fetching doctors:', error);
         });
+
+        //fetch the names of doctors who have access to the patient data
+        axios.get(`http://localhost:3000/shared-doctors/${username}`)
+        .then(response => {
+          setSharedDoctors(response.data);
+          console.log("shared doctors",response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching doctors:', error);
+        });
+
+
+        
   
       // Fetch shared files for doctor from the backend
       axios.get(`http://localhost:3000/shared-documents/${username}`)
@@ -136,33 +152,49 @@ const { username } = React.useContext(AuthContext);
     }
   };
 
+  const handleRemoveShare = async (doctorName) => {
+    try {
+      const response = await axios.post('http://localhost:3000/remove-shared', {
+        patientName : username,
+        doctorName
+      });
+      console.log('File unshared successfully:', response.data);
+    }
+    catch (error) {
+      console.error('Error unsharing file:', error);
+    }
+  }
+
   return (
-    <Box pl={'150px'} pt='10px' bg={'bg'} display="flex" flexDirection={'row'} height={'80vh'} width="100%" mt="0px" justifyContent={'space-around'}>
+    <Box pl={'150px'} pt='10px' bg={'bg'} height={'80vh'} width="100%" mt="0px">
 
       
 {isdoctor ? (
-        <VStack spacing="4" align="stretch">
+        <VStack alignItems={'left'}   spacing="4" >
        
-        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+        <VStack alignItems={'left'}   gap={6}>
           {drdocs && drdocs.length > 0 ? (
             
             drdocs.map(file => (
               
-              <GridItem key={file.id}>
-                 <Heading mb="10">Shared Documents {file.patientId}</Heading>
+
+              <VStack alignItems={'left'}  key={file.id} >
+                 <Heading mb="10">Shared Documents {file.patientName}</Heading>
+              <Grid   templateColumns={"repeat(3, 1fr)"}>
                 {file.files.map(f => (
-                  <>
+                  <Box >
                     <MdInsertDriveFile size={32} />
                     <Text key={f.id}>{f.filename}</Text>
                     <Button onClick={() => window.open(`https://ipfs.io/ipfs/${f.ipfsHash}`, '_blank')}>View</Button>
-                  </>
+                  </Box >
                 ))}
-              </GridItem>
+                </Grid>
+              </VStack>
             ))
           ) : (
             <Text>No documents shared</Text>
           )}
-        </Grid>
+        </VStack>
       </VStack>
       )
 
@@ -198,7 +230,22 @@ const { username } = React.useContext(AuthContext);
   ))}
 </Select>
         <Button onClick={() => handleShare( selectedDoctor)} mt="2">Share</Button>
-  
+
+
+        <Heading mb="4">Doctors with access</Heading>
+        <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+        {sharedDoctors && sharedDoctors.length > 0 ? (
+  sharedDoctors.map(file => (
+    <GridItem key={file.id} display={'flex'} gap={'12px'} alignItems={'center'}>
+      <Text>{file.doctorName}</Text> {/* Add null check */}
+      <Button onClick={() => handleRemoveShare(file.doctorName)}>Remove access</Button>
+    </GridItem>
+  ))
+) : (
+  <Text>No doctors shared</Text>
+)}
+</Grid>
+      
       </VStack>
 
       )}

@@ -208,7 +208,6 @@ app.get('/files/:uid', async (req, res) => {
  // Extract the IPFS hashes of the patient's files from MongoDB
 const patientIPFSHashes = patient.files.flatMap(innerArray => innerArray.map(file => file.ipfsHash));
 
-    console.log('Patient IPFS hashes:', patientIPFSHashes);
 
     // Fetch all pinned files from Pinata
     const response = await axios.get(
@@ -219,12 +218,10 @@ const patientIPFSHashes = patient.files.flatMap(innerArray => innerArray.map(fil
         },
       }
     );
-    console.log('response', response.data.rows);
+ 
 
     // Filter the pinned files to only include those with IPFS hashes present in both MongoDB and the retrieved list
     const patientFiles = response.data.rows.filter(file => patientIPFSHashes.includes(file.ipfs_pin_hash));
-
-    console.log('Patient files:', patientFiles);
 
     // Send the filtered files as the response
     res.status(200).json(patientFiles);
@@ -490,6 +487,7 @@ const Clinic = require('./models/clinic');
     
         // Find the patient document with the patient name
         const patient = await Patient.findOne({ name: patientname });
+        console.log("patient",patient);
     
         if (!patient) {
           console.log("Patient not found");
@@ -502,10 +500,35 @@ const Clinic = require('./models/clinic');
       ipfsHash: file[0].ipfsHash,
     }));
 
-    // Push the extracted file information to the doctor's sharedDocuments array
-    doctor.sharedDocuments.push({ patientId: patientname, files: sharedFiles });
-    await doctor.save();
+    const shared =1;
+   //if the inside shared doucments array of the doctor the patient name is already present then update the shared files array with the new file
+    for (let i = 0; i < doctor.sharedDocuments.length; i++) {
+      if (doctor.sharedDocuments[i].patientName === patientname) {
+        doctor.sharedDocuments[i].files.push(...sharedFiles);
+        shared = 0;
+        await doctor.save();
+        break;
+      }
+    }
+    if(shared === 1){
+      doctor.sharedDocuments.push({ patientName: patientname, files: sharedFiles });
+      await doctor.save();
 
+    }
+
+
+
+    //push the name of the doctor to the patient's sharedDoctors array if the doctor name is not already present in the array
+    if (!patient.sharedFiles.some(file => file.doctorName === fileId)) {
+
+    patient.sharedFiles.push({ doctorName: fileId });
+    await patient.save();
+  }
+
+
+   
+
+   
 
         res.status(200).json({ success: true });
       } catch (error) {
@@ -513,6 +536,31 @@ const Clinic = require('./models/clinic');
         res.status(500).json({ success: false, error: 'Failed to share documents' });
       }
     });
+
+
+    //Endpoints to fetch the details of the doctors who have access to the shared documents
+
+    app.get('/shared-doctors/:patientName', async (req, res) => {
+      try {
+        const { patientName } = req.params;
+    
+        // Find the patient document with the patient name
+        const patient
+          = await Patient .findOne({ name: patientName });
+
+        if (!patient) { 
+          return res.status(404).json({ success: false, error: 'Patient not found' });
+        }
+
+        const sharedDoctors = patient.sharedFiles;
+        res.status(200).json(sharedDoctors);
+      } catch (error) {
+        console.error('Error fetching shared doctors:', error);
+        res.status(500).json({ error: 'Failed to fetch shared doctors' });
+      }
+    }
+    );
+
 
 
     // Endpoint to fetch shared documents for a specific doctor from MongoDB
@@ -539,9 +587,55 @@ const Clinic = require('./models/clinic');
 
     );
 
-    // Endpoint to fetch shared documents for a specific patient from MongoDB
-    
+    // Endpoint to remove shared documents for a specific doctor from MongoDB
 
+    app.post('/remove-shared', async (req, res) => {
+
+      try {
+        const { doctorName, patientName } = req.body;
+
+        // Find the doctor document with the doctor name
+        const doctor = await Doctor.findOne
+        ({ name: doctorName });
+
+        if (!doctor) {
+          return res.status(404).json({ success: false, error: 'Doctor not found' });
+        }
+
+        // Find the patient document with the patient name
+
+        const patient = await Patient
+        .findOne({ name: patientName });
+
+        if (!patient) {
+          return res.status(404).json({ success: false, error: 'Patient not found' });
+        }
+
+        console.log("doctor name",doctorName, "patient name",patientName);
+
+        // Remove the patient's name from the doctor's sharedDocuments array
+        doctor.sharedDocuments = doctor.sharedDocuments.filter(doc => doc.patientName !== patientName);
+        console.log("doctor shared documents",doctor.sharedDocuments);
+
+        // Remove the doctor's name from the patient's sharedDoctors array
+        patient.sharedFiles = patient.sharedFiles.filter(file => file.doctorName !== doctorName);
+        console.log("patient shared files",patient.sharedFiles);
+
+
+        await doctor.save();
+        await patient.save();
+
+        res.status(200).json({ success: true });
+
+      } catch (error) {
+        console.error('Error removing shared documents:', error);
+        res.status(500).json({ success: false, error: 'Failed to remove shared documents' });
+      }
+
+    }
+
+    );
+    
 
 
 
@@ -1040,6 +1134,40 @@ const Clinic = require('./models/clinic');
 
 
         );
+
+
+
+        //End point to fetch details about a specific doctor from MongoDB
+
+        app.get('/doctor/:doctorName', async (req, res) => {
+          try {
+            const { doctorName } = req.params;
+
+
+            // Find the doctor document with the doctor name
+
+            const doctor = await Doctor.findOne({ name: doctorName });
+
+            if (!doctor) {
+              return res.status(404).json({ success: false, error: 'Doctor not found' });
+            }
+
+            res.status(200).json(doctor);
+
+          } catch (error) {
+
+              console.error('Error fetching doctor:', error);
+
+              res.status(500).json({ error: 'Failed to fetch doctor' });
+
+            }
+
+        }
+        
+        );
+
+
+
 
 
         //end point to fetch doctors for a specific clinic from MongoDB
