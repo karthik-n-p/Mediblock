@@ -200,7 +200,7 @@ export default function LandingContent() {
         >
           <Box alignSelf="start">
            
-            <Text h2
+            {/* <Text h2
               mb={3}
               fontSize={{
                 base: "3xl",
@@ -218,7 +218,27 @@ export default function LandingContent() {
               letterSpacing="tight"
             >
               All-in-one platform
-            </Text>
+            </Text> */}
+            <Text
+  as="h2" // Specify the heading level here
+  mb={3}
+  fontSize={{
+    base: "3xl",
+    md: "4xl",
+  }}
+  fontWeight="extrabold"
+  textAlign={{
+    sm: "left",
+  }}
+  _light={{
+    color: "black",
+  }}
+  lineHeight="shorter"
+  letterSpacing="tight"
+>
+  All-in-one platform
+</Text>
+
             <Text
               mb={6}
               fontSize={{

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
+// import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/UserPages/Login';
 import SignUpPage from './pages/UserPages/SignUp';
@@ -13,7 +15,7 @@ import Landing from './pages/UserPages/Landing';
 import Sidebar from './components/landing-page/Navbar';
 import Header from './components/landing-page/header';
 import PracQues from './pages/UserPages/Practice';
-import ResourcePage from './pages/UserPages/Resources';
+import DoctorDashboard from './pages/UserPages/Resources';
 
 import AdminDashboard from './pages/AdminPages/AdminDashboard';
 
@@ -145,7 +147,7 @@ const App = () => {
               <Route path="/signup" element={<SignUpPage handleSignupSuccess={handleSignupSuccess} />} />
               <Route path='/profile' element={<Profile/>}/>
               <Route path="/practice" element={<PracQues />} />
-              <Route path="/resource" element={<ResourcePage />} />
+              <Route path="/resource" element={<DoctorDashboard />} />
               <Route path="/admin" element={isadmin ? <AdminDashboard /> : <Unauthorized />} />
               <Route path="/clinic" element={<ClinicDashboard />} />
                    </Routes>
@@ -156,4 +158,5 @@ const App = () => {
   );
 };
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+// ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+createRoot(document.getElementById('root')).render(<App />);
