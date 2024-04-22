@@ -9,23 +9,32 @@ import AuthContext from './pages/UserPages/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, firestore } from './pages/UserPages/firebase-auth';
 
-import QuestionPage from './pages/UserPages/Question';
+
+import QuestionPage from './pages/UserPages/Upload';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react'; // Import ChakraProvider and extendTheme
 import Landing from './pages/UserPages/Landing';
 import Sidebar from './components/landing-page/Navbar';
 import Header from './components/landing-page/header';
 import PracQues from './pages/UserPages/Practice';
-import DoctorDashboard from './pages/UserPages/Resources';
 
-import AdminDashboard from './pages/AdminPages/AdminDashboard';
+import DoctorDashboard from './pages/AdminPages/AdminDashboard';
+import DoctorDashboard1 from './pages/AdminPages/AdminDashboard';
 
 import Videochat from './pages/UserPages/Videochat';
 import Unauthorized from './pages/AdminPages/Unauthorized';
 
-import Profile from './pages/UserPages/ProfilePage';
-
 import './index.css';
 import ClinicDashboard from './pages/Clinincs/Clinic';
+
+import BookSlot from './pages/UserPages/BookSlot';
+
+
+import Upload from './pages/UserPages/Upload';
+import axios from 'axios';
+import CreateDr from './pages/Clinincs/CreateDr';
+import Clinic from './pages/Clinincs/Clinic';
+import ClinicDrProfile from './pages/Clinincs/ClinicDrProfile';
+import PatientAppointment from './pages/UserPages/PatientAppointment';
 // Create a custom theme with the desired default color mode (dark)
 const customTheme = extendTheme({
   fonts: {
@@ -55,6 +64,8 @@ const App = () => {
   const [isadmin, setIsadmin] = useState(false);
   const [isdoctor, setIsdoctor] = useState(false);
 
+
+  
   useEffect(() => {
     const storedAuthData = localStorage.getItem('authData');
 
@@ -91,11 +102,12 @@ const App = () => {
             console.log("user data of doctor ",user);
     
             localStorage.setItem('authData', JSON.stringify({ username: user.displayName , isdoctor: isdoctor, isadmin: isAdmin}));
+       
    
         }
         else{
           setIsdoctor(false);
-  
+          
         const userDoc = await getDoc(doc(firestore, 'username', user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
@@ -103,6 +115,22 @@ const App = () => {
           setIsRegistered(true);
   
           localStorage.setItem('authData', JSON.stringify({ username: user.displayName, uid: user.uid, isadmin: isAdmin }));
+          axios.post('http://localhost:3000/create-patient', {
+            username: userData.username,
+            email: user.email,
+            uid: user.uid,
+          });
+        }
+        else{
+          console.log("user data of user ",user);
+          setUsername(user.displayName);
+          setIsRegistered(true);
+          localStorage.setItem('authData', JSON.stringify({ username: user.displayName, uid: user.uid, isadmin: isAdmin }));
+          axios.post('http://localhost:3000/create-patient', {
+            username: user.displayName,
+            email: user.email,
+            uid: user.uid,
+          });
         }
       }
       }
@@ -141,14 +169,25 @@ const App = () => {
               <Header />
             </div>
             <Routes>
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={isdoctor ? <DoctorDashboard /> :<Landing />} />
           <Route path="/room/:roomId" element={<Videochat />} />
               <Route path="/login" element={<LoginPage handleSignupSuccess={handleSignupSuccess} />} />
               <Route path="/signup" element={<SignUpPage handleSignupSuccess={handleSignupSuccess} />} />
-              <Route path='/profile' element={<Profile/>}/>
-              <Route path="/practice" element={<PracQues />} />
-              <Route path="/resource" element={<DoctorDashboard />} />
-              <Route path="/admin" element={isadmin ? <AdminDashboard /> : <Unauthorized />} />
+       
+              <Route path="/appointment" element={<PracQues />} />
+{/*            
+              <Route path="/admin" element={isdoctor ? <DoctorDashboard /> : <Unauthorized />} /> */}
+              <Route path="/create-dr" element={<CreateDr />} />
+              <Route path="/clinic" element={<Clinic/>} />
+              <Route path='/Upload' element={<Upload />} />
+              <Route path='/doctordashboard' element={<DoctorDashboard />} />
+              <Route path='/bookslot/:name' element={<BookSlot/>}/>
+
+              <Route path="/view-doctor/:name" element={<ClinicDrProfile/>} />
+
+              <Route path='/booked-appointment/:name' element={<PatientAppointment/>} />
+             
+            
               <Route path="/clinic" element={<ClinicDashboard />} />
                    </Routes>
           </ChakraProvider>

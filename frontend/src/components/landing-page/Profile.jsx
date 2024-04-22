@@ -25,6 +25,64 @@ function Profile() {
     const [skills,setSkill] = React.useState([]);
     const [profileUrl,setProfileUrl]=React.useState("");
     const [socialLinks,setSocialLinks]=React.useState({})
+    const [patients, setPatients] = React.useState([]);
+    const [futureAppointments, setFutureAppointments] = React.useState([]);
+    const [presentAppointments, setPresentAppointments] = React.useState([]);
+
+
+    React.useEffect(() => {
+        
+
+
+      const fetchPatients = async () => {
+          try {
+            const patientsCollection = await axios.get(`http://localhost:3000/past-appointments-patient/${username}`);
+            //divide futrue array into 2 arrays first 4 and last 4 and combine them as array of arrays
+            console.log("patientsCollection",patientsCollection.data);
+
+            if(patientsCollection.data.FutureAppiontments.length > 0){
+
+              let future = [];
+              let i,j,temparray,chunk = 4;
+              for (i=0,j=patientsCollection.data.FutureAppiontments.length; i<j; i+=chunk) {
+
+                  temparray = patientsCollection.data.FutureAppiontments.slice(i,i+chunk);
+                  future.push(temparray);
+
+              }
+              console.log("future",future);
+              setFutureAppointments(future);
+            }
+
+            if(patientsCollection.data.LiveAppointments.length > 0){
+              let live = [];
+              let i,j,temparray,chunk = 4;
+              for (i=0,j=patientsCollection.data.LiveAppointments.length; i<j; i+=chunk) {  
+                  temparray = patientsCollection.data.LiveAppointments.slice(i,i+chunk);
+                  live.push(temparray);
+              }
+              console.log("live",live);
+              setPresentAppointments(live);
+            }
+          } catch (error) {
+            console.error('Error fetching patients:', error);
+          }
+        };
+        fetchPatients();
+    }, [name]);
+
+    let appointmentData = [];
+
+// Check if live appointments exist
+if (presentAppointments.length > 0) {
+  appointmentData = presentAppointments;
+} else if (futureAppointments.length > 0) { // If no live appointments, check for upcoming appointments
+  appointmentData = futureAppointments;
+} 
+    
+
+
+
 
   // Sample data for each condition
   const bloodStatusData = {
@@ -131,22 +189,49 @@ function Profile() {
           </VStack>
           <VStack spacing="10px" alignSelf={'flex-start'}>
             <Heading alignSelf={'flex-start'} fontSize={'32px'} lineHeight={'40px'} fontWeight="normal" color="black">My Appointments</Heading>
-            <VStack display={'flex'} flexDirection={'column'} gap={'10px'} bg="white" borderRadius={'30px'} p={'20px'}>
-              <HStack alignSelf={'flex-start'}>
-                <Flex p='20px' color={'#FF6B3C'} bg="bg" borderRadius={'20px'}>
-                  <FaCalendar size={'30px'} color='grey' />
-                </Flex>
-                <Text fontWeight={'normal'}>Next Checkup <br /> Fri,24 Mar</Text>
-              </HStack>
-              <HStack borderRadius={'20px'} p='10px' display={'flex'} gap={'5px'} bg={'bg'}>
-                <Image src={Doctor} alt="LandingPic" w={'200px'} />
-                <Text>Dr.Sita Ram</Text>
-              </HStack>
-              <Button alignSelf={'flex-start'} justifyContent={'space-between'} w="200px" h="40px" color="white" bg="btng" onClick={() => navigate('/profile')}>
-                <Text>View All</Text>
-                <FaChevronRight size={'20px'} />
-              </Button>
-            </VStack>
+            <VStack spacing="10px">
+  <Heading alignSelf="flex-start" fontSize="32px" lineHeight="40px" fontWeight="normal" color="black">
+    My Appointments
+  </Heading>
+  {appointmentData.length > 0 ? (
+    <VStack display="flex" flexDirection="column" gap="10px" bg="white" borderRadius="30px" p="20px">
+      <HStack alignSelf="flex-start">
+        <Flex p="20px" color="#FF6B3C" bg="bg" borderRadius="20px">
+          <FaCalendar size="30px" color="grey" />
+        </Flex>
+        <Text fontWeight="normal">
+          {presentAppointments.length > 0 ? "Live Appointments" : 
+          (futureAppointments.length > 0 ? "Upcoming Appointments" : "Past Appointments")}
+          <br />
+        </Text>
+      </HStack>
+      {appointmentData[0].map((appointment) => (
+        <HStack key={appointment._id} borderRadius="20px" p="10px" display="flex" gap="5px" bg="bg">
+          <VStack spacing="10px">
+            <Text fontWeight="normal">{appointment.startTime}</Text>
+            <Text fontWeight="normal">{appointment.endTime}</Text>
+          </VStack>
+        </HStack>
+      ))}
+      <Link to={`/booked-appointment/${username}`}>
+        <Button alignSelf="flex-start" justifyContent="space-between" w="200px" h="40px" color="white" bg="btng">
+          <Text>View All</Text>
+          <FaChevronRight size="20px" />
+        </Button>
+      </Link>
+    </VStack>
+  ) : (
+    <VStack display="flex" flexDirection="column" gap="10px" bg="white" borderRadius="30px" p="20px">
+      <Text fontWeight="normal">No appointments available.</Text>
+      <Link to="/book-appointment">
+        <Button alignSelf="flex-start" justifyContent="space-between" w="200px" h="40px" color="white" bg="btng">
+          <Text>Book Appointment</Text>
+          <FaChevronRight size="20px" />  
+        </Button>
+      </Link>
+    </VStack>
+  )}
+</VStack>
           </VStack>
         </HStack>
         <Heading alignSelf={'flex-start'} fontSize="32px" lineHeight={'40px'} fontWeight="normal" color="black">My Body Conditions</Heading>
@@ -166,7 +251,7 @@ function Profile() {
             </HStack>
           </Box>
           <Box position={'relative'} bg="bg" borderRadius={'30px'} p={'10px'} border='3px solid white' alignItems={'center'} justifyContent={'center'}>
-            <Image src={'https://img.freepik.com/premium-psd/3d-flow-red-blood-cells-iron-platelets-realistic-medical-illustration-isolated-transparent-png-background_81863-9570.jpg'} alt="LandingPic" w={'200px'} />
+            <Image src={'https://static.vecteezy.com/system/resources/previews/023/638/069/original/3d-flow-red-blood-cells-iron-platelets-erythrocyte-anemia-realistic-medical-analysis-illustration-isolated-transparent-background-png.png'} alt="LandingPic" w={'200px'} />
             <HStack pos={'absolute'} bottom={'0px'} right={'0px'} left={'0px'} border={'3px solid white'} borderRadius={'30px'} p={'10px'} alignItems={'center'} justifyContent={'space-between'}>
               <Text>My Blood</Text>
               <FaChevronCircleRight size={'20px'} />

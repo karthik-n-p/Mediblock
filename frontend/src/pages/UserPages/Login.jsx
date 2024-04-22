@@ -1,9 +1,11 @@
 import React, { useRef } from 'react';
-import { Box, Flex, Divider, Text, Input, Button, Heading,Alert,AlertIcon } from '@chakra-ui/react';
+import { Box, Flex, Divider, Text, Input, Button, Heading,Alert,AlertIcon,Select } from '@chakra-ui/react';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
 import { getAuth, signInWithEmailAndPassword,sendPasswordResetEmail,signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useNavigate,Link} from 'react-router-dom';
 import axios from 'axios';
+import { useContext } from 'react';
+import AuthContext from './AuthContext';
 
 
 
@@ -18,6 +20,9 @@ const LoginPage = ({ handleSignupSuccess }) => {
   const [error, setError] = React.useState(null);
   const [resetPasswordMessage, setResetPasswordMessage] = React.useState('');
   const [isadmin, setIsadmin] = React.useState(false);
+  const [userType, setUserType] = React.useState('');
+
+  const {isdoctor} = useContext(AuthContext);
 
 const checkAdmin = async (user) => {
    
@@ -37,13 +42,13 @@ const checkAdmin = async (user) => {
           navigate('/clinic')
 
       }
+    
       else{
-        console.log("user is not admin");
+        console.log("user is patient");
         handleSignupSuccess(user,response.data.isAdmin)
-     
         navigate('/')
-
       }
+
     }
     )
     .catch((error) => {
@@ -145,6 +150,16 @@ const checkAdmin = async (user) => {
             <Heading fontStyle="normal" fontWeight="bold" fontSize="5xl" p="40px 65px 35px 0px">
               Log In
             </Heading>
+            <Select
+              placeholder="Select User Type"
+              value={userType}
+              onChange={(e) => setUserType(e.target.value)}
+              mb={4}
+            >
+              <option value="clinic">Clinic</option>
+              <option value="doctor">Doctor</option>
+              <option value="patient">Patient</option>
+            </Select>
             <Box display={'flex'} alignItems={'center'} justifyContent={'space-evenly'}  w="250px" h="45px" border={'3px solid white'} borderRadius="4px" cursor={'pointer'} onClick={handleGoogleSignIn}>
                     <FaGoogle size="25px"  />
                     <Text color="black" fontSize="md" lineHeight={"18px"} bg={''}>
