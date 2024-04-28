@@ -28,7 +28,10 @@ function Profile() {
     const [patients, setPatients] = React.useState([]);
     const [futureAppointments, setFutureAppointments] = React.useState([]);
     const [presentAppointments, setPresentAppointments] = React.useState([]);
-
+    const [steps, setSteps] = React.useState([]);
+    const [weight, setWeight] = React.useState([]);
+    const [distance, setDistance] = React.useState([]);
+    const [dates, setDates] = React.useState([]);
 
     React.useEffect(() => {
         
@@ -80,16 +83,63 @@ if (presentAppointments.length > 0) {
   appointmentData = futureAppointments;
 } 
     
+useEffect(() => {
+  const fetchSheetData = async () => {
+    const SPREADSHEET_ID = '1FhZVjp-vLu4pes2Z2UGYS9kfXEIOOcSVa3OUMrsxImM'; // Replace with your actual spreadsheet ID
+const SHEET_NAME = 'History'; // Replace with the actual name of your sheet if it's different
+const API_KEY = 'AIzaSyDZ8Jd8Z2vYK8aVYyr6QHpg7uvwYKBIH0k'; // Replace with your actual API key
 
 
+    try {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}`;
+      const response = await axios.get(url, {
+        params: {
+          key: API_KEY,
+        },
+      });
+      const data = response.data.values;
+      console.log('Sheet data:', data);
 
+      // Extracting the relevant data for the charts
+      const dates = data.slice(1).map(row => row[0]); // Extract dates
+      const steps = data.slice(1).map(row => parseInt(row[1])).filter(val => !isNaN(val)); // Extract steps as integers and remove NaN values
+      const weight = data.slice(1).map(row => parseFloat(row[2])).filter(val => !isNaN(val)); // Extract weight as floats and remove NaN values
+      const distance = data.slice(1).map(row => parseFloat(row[3])).filter(val => !isNaN(val)); // Extract distance as floats and remove NaN values
+      
+      // Update the state with the fetched data
+      setDates(dates);
+      setSteps(steps);
+      setWeight(weight);
+      setDistance(distance);
+      // Updating the state or replacing the hardcoded data in your charts
+    
+      // Process the fetched data as needed in your application
+    } catch (error) {
+      console.error('Error fetching sheet data:', error);
+    }
+  };
+  
+  // Call the function to fetch data
+  fetchSheetData();
+
+}, []);
+
+const slicedDates = dates.slice(0, 6);
+const slicedSteps = steps.slice(0, 6);
+const slicedWeight = weight.slice(0, 6);
+const slicedDistance = distance.slice(0, 6);
+
+const dayNumbers = slicedDates.map(date => {
+  const [day] = date.split('/');
+  return day;
+});
 
   // Sample data for each condition
   const bloodStatusData = {
-    labels: ['1', '2', '3', '4', '5', '6', '7'],
+    labels:dayNumbers,
     datasets: [{
       label: 'Blood Status',
-      data: [120, 110, 115, 118, 122, 125, 130],
+      data: slicedSteps,
       backgroundColor: 'rgba(255, 99, 132, 0.2)',
       borderColor: 'rgba(255, 99, 132, 1)',
       borderWidth: 1
@@ -179,7 +229,7 @@ if (presentAppointments.length > 0) {
           <VStack spacing="10px">
             <Heading alignSelf={'flex-start'} fontSize="32px" lineHeight={'40px'} fontWeight="normal" color="black">My Heart Condition</Heading>
             <HStack spacing="20px" alignItems="center">
-              <Feature title="Blood Status" value={'116/70'} icon={FaChartBar} chartData={bloodStatusData} chartType={'line'} />
+            <Feature title="Steps" value={'Steps Value'} icon={FaChartBar} chartData={bloodStatusData} chartType={'line'} />
               <Feature title="Heart Rate" value={'120bpm'} icon={FaChartLine} chartData={heartRateData} chartType={'line'} />
             </HStack>
             <HStack spacing="20px" alignItems="center">

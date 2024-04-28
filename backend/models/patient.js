@@ -29,6 +29,8 @@ const patientSchema = new mongoose.Schema({
     doctorName: String,
    
   }],
+
+  
 });
 
 const Patient = mongoose.model('Patient', patientSchema);

@@ -39,6 +39,10 @@ const doctorSchema = new mongoose.Schema({
   }],
 
   
+
+
+
+  
 appointment: [{ 
     patientId: String,
     patientName: String,

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { useParams } from "react-router-dom";
+import { Box, Text } from "@chakra-ui/react";
 
 function Videochat() {
   const { roomId } = useParams();
@@ -41,9 +42,12 @@ function Videochat() {
   }, [roomId]);
 
   return (
-    <div>
+    <Box w={'100px'} h={'100px'}>
       <div ref={elementRef}></div>
-    </div>
+     <Box w="500px" h={'500px'} bg={'red'}>
+
+     </Box>
+    </Box>
   );
 }
 
