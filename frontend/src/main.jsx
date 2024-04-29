@@ -51,9 +51,17 @@ const customTheme = extendTheme({
     grey1: '#A0AEC0',
     txtb: '#000000',
   },
-  config: {
-    initialColorMode: 'dark', // Set to 'dark' for dark mode by default
+
+  styles: {
+    global: {
+      body: {
+        color: 'txtb',
+        bg: 'bg',
+      },
+    },
   },
+  
+ 
 });
 
 const App = () => {
@@ -61,6 +69,8 @@ const App = () => {
   const [username, setUsername] = useState('');
   const [isadmin, setIsadmin] = useState(false);
   const [isdoctor, setIsdoctor] = useState(false);
+
+  
 
 
   
@@ -99,7 +109,7 @@ const App = () => {
             setIsRegistered(true);
             console.log("user data of doctor ",user);
     
-            localStorage.setItem('authData', JSON.stringify({ username: user.displayName , isdoctor: isdoctor, isadmin: isAdmin}));
+            localStorage.setItem('authData', JSON.stringify({ username: user.displayName , isdoctor: true, isadmin: isAdmin}));
        
    
         }
@@ -112,7 +122,7 @@ const App = () => {
           setUsername(userData.username);
           setIsRegistered(true);
   
-          localStorage.setItem('authData', JSON.stringify({ username: user.displayName, uid: user.uid, isadmin: isAdmin }));
+          localStorage.setItem('authData', JSON.stringify({ username: user.displayName, isdoctor: false, uid: user.uid, isadmin: isAdmin }));
           axios.post('http://localhost:3000/create-patient', {
             username: userData.username,
             email: user.email,
@@ -123,7 +133,7 @@ const App = () => {
           console.log("user data of user ",user);
           setUsername(user.displayName);
           setIsRegistered(true);
-          localStorage.setItem('authData', JSON.stringify({ username: user.displayName, uid: user.uid, isadmin: isAdmin }));
+          localStorage.setItem('authData', JSON.stringify({ username: user.displayName, isdoctor: false, uid: user.uid, isadmin: isAdmin }));
           axios.post('http://localhost:3000/create-patient', {
             username: user.displayName,
             email: user.email,
@@ -134,7 +144,7 @@ const App = () => {
       }
     } catch (error) {
       setIsRegistered(false);
-      console.log(error);
+      console.log(error);({username: '', isdoctor: false, isadmin: false, uid: ''})
     }
   };
 
@@ -143,8 +153,9 @@ const App = () => {
     setIsRegistered(false);
     setUsername('');
     setIsadmin(false);
+    setIsdoctor(false);
+    localStorage.setItem('authData', JSON.stringify({ username: '', isdoctor: false, isadmin: false, uid: '' }));
 
-    localStorage.removeItem('authData');
   };
 
   return (

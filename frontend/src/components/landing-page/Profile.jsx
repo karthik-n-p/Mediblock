@@ -273,7 +273,7 @@ const dayNumbers = slicedDates.map(date => {
   ) : (
     <VStack display="flex" flexDirection="column" gap="10px" bg="white" borderRadius="30px" p="20px">
       <Text fontWeight="normal">No appointments available.</Text>
-      <Link to="/book-appointment">
+      <Link to="/appointment">
         <Button alignSelf="flex-start" justifyContent="space-between" w="200px" h="40px" color="white" bg="btng">
           <Text>Book Appointment</Text>
           <FaChevronRight size="20px" />  
@@ -284,30 +284,7 @@ const dayNumbers = slicedDates.map(date => {
 </VStack>
           </VStack>
         </HStack>
-        <Heading alignSelf={'flex-start'} fontSize="32px" lineHeight={'40px'} fontWeight="normal" color="black">My Body Conditions</Heading>
-        <HStack spacing="20px" alignItems="center" pb="20px">
-          <Box position={'relative'} bg="bg" borderRadius={'30px'} p={'10px'} border='3px solid white' alignItems={'center'} justifyContent={'center'}>
-            <Image src={LandingPic} alt="LandingPic" w={'200px'} />
-            <HStack pos={'absolute'} bottom={'0px'} right={'0px'} left={'0px'} border={'3px solid white'} borderRadius={'30px'} p={'10px'} alignItems={'center'} justifyContent={'space-between'}>
-              <Text>My Heart</Text>
-              <FaChevronCircleRight size={'20px'} />
-            </HStack>
-          </Box>
-          <Box position={'relative'} bg="bg" borderRadius={'30px'} p={'10px'} border='3px solid white' alignItems={'center'} justifyContent={'center'}>
-            <Image src={'https://cdn3d.iconscout.com/3d/premium/thumb/lungs-organ-5687741-4744099.png?f=webp'} alt="LandingPic" w={'200px'} />
-            <HStack pos={'absolute'} bottom={'0px'} right={'0px'} left={'0px'} border={'3px solid white'} borderRadius={'30px'} p={'10px'} alignItems={'center'} justifyContent={'space-between'}>
-              <Text>My Lungs</Text>
-              <FaChevronCircleRight size={'20px'} />
-            </HStack>
-          </Box>
-          <Box position={'relative'} bg="bg" borderRadius={'30px'} p={'10px'} border='3px solid white' alignItems={'center'} justifyContent={'center'}>
-            <Image src={'https://static.vecteezy.com/system/resources/previews/023/638/069/original/3d-flow-red-blood-cells-iron-platelets-erythrocyte-anemia-realistic-medical-analysis-illustration-isolated-transparent-background-png.png'} alt="LandingPic" w={'200px'} />
-            <HStack pos={'absolute'} bottom={'0px'} right={'0px'} left={'0px'} border={'3px solid white'} borderRadius={'30px'} p={'10px'} alignItems={'center'} justifyContent={'space-between'}>
-              <Text>My Blood</Text>
-              <FaChevronCircleRight size={'20px'} />
-            </HStack>
-          </Box>
-        </HStack>
+        
       </VStack>
     </Box>
   );

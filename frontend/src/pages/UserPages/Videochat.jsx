@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { useParams } from "react-router-dom";
-import Prescription from "./Resources"; // Import the Prescription component
+import Prescription from "./Prescription"; // Import the Prescription component
 
 function Videochat() {
   const { roomId } = useParams();
   const elementRef = useRef(null);
+  
 
   useEffect(() => {
     const meeting = async () => {
@@ -40,7 +41,7 @@ function Videochat() {
   }, [roomId]);
 
   return (
-    <div style={{ display: "flex", justifyContent: "space-between" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", paddingLeft: "115px" }}>
       <div style={{ flex: 1 }}>
         <div ref={elementRef}></div>
       </div>

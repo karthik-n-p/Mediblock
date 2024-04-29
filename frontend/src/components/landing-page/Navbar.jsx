@@ -26,6 +26,7 @@ const Sidebar = () => {
   const {isadmin} = useContext(AuthContext);
   const {isdoctor ,username} = useContext(AuthContext);
 
+
   console.log("isadmin in sidebar",isadmin);
   const handleToggleExpand = () => {
     setIsExpanded(!isExpanded);

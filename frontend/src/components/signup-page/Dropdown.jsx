@@ -21,6 +21,7 @@ export default function Dropdown({handleToggleDropdown }) {
       
         handleSignupSuccess(null);
         handleToggleDropdown();
+        navigate('/');
         afterlogout();
         // Additional logout actions if needed
       })

@@ -50,7 +50,14 @@ appointment: [{
     status: String,
     meetingLink: String,
     mode: String,
+    prescriptions: [{
+      medicationName: String,
+      dosage: String,
+      instructions: String,
+    }],
   }],
+
+
 
 
   sharedDocuments: [{ 

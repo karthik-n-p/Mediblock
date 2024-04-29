@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useContext, useState } from 'react'
 import AuthContext from './AuthContext';
-import { Box, Button, Input, Select, Text, VStack,HStack } from "@chakra-ui/react";
+import { Box, Button, Input, Select, Text, VStack,HStack, Toast, useToast } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 
 function PatientAppointment() {
@@ -10,6 +10,9 @@ function PatientAppointment() {
     const [pastAppointment, setPastAppointments] = useState([]);
     const [liveAppointment, setPresentAppointments] = useState([]);
     const [futureAppointment, setFutureAppointments] = useState([]);
+    const [cancelledAppointment, setCancelledAppointments] = useState([]);
+
+    const Toast = useToast();
   
 
 
@@ -36,16 +39,30 @@ function PatientAppointment() {
     
         //divide future appointmetns into slices of 4 and combine them as array of arrays by dividing total length by 4
     
-        let future = [];
-        let i,j,temparray,chunk = 4;
-        for (i=0,j=patientsCollection.data.FutureAppiontments.length; i<j; i+=chunk) {
-            temparray = patientsCollection.data.FutureAppiontments.slice(i,i+chunk);
-            future.push(temparray);
-    
+      
+
+    let cancelled = [];
+    let future = [];
+    let i,j,temparray,chunk = 5;
+    for (i=0,j=patientsCollection.data.FutureAppiontments.length; i<j; i+=chunk) {
+      console.log("patientsCollection.data.FutureAppiontments",patientsCollection.data.FutureAppiontments)
+        temparray = patientsCollection.data.FutureAppiontments.slice(i,i+chunk);
+        console.log("temparray",temparray);
+        if(temparray[4] == "cancelled"){
+          cancelled.push(temparray);
+
+         
         }
-        console.log("future",future);
-        setFutureAppointments(future);
-     
+        else{
+        future.push(temparray);
+        }
+
+
+    }
+    console.log("future",future);
+    console.log("cancelled",cancelled)
+    setCancelledAppointments(cancelled);
+    setFutureAppointments(future);
     
           }
     
@@ -95,16 +112,58 @@ function PatientAppointment() {
           console.error('Error fetching patients:', error);
         }
       };
-
+setInterval(() => {
     fetchPatients();
+  }, 1000);
     
   
-    }, [])
+    }, [pastAppointment, liveAppointment, futureAppointment, cancelledAppointment])
 
     
   const consult = (patientId) => {
     navigate(`/room/${patientId}`);
   };
+
+  const handleCancel = async (appointmentdata) => {
+
+    const meetingLink = appointmentdata[3]
+    const doctorName = appointmentdata[1];
+    const patientName = name;
+
+    console.log('Cancelling appointment:', meetingLink, doctorName, patientName);
+
+
+
+    try {
+
+      await axios.post('http://localhost:3000/cancel-appointment', {
+        meetingLink,
+        doctorName,
+        patientName,
+      });
+
+      Toast({
+        title: 'Appointment cancelled successfully',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      
+
+      console.log('Appointment cancelled successfully');
+
+      // Reset form after submission
+
+    } catch (error) {
+      console.error('Error cancelling appointment:', error);
+    }
+
+  };
+
+
+
+
+
 
   
 
@@ -137,6 +196,10 @@ function PatientAppointment() {
         <Box key={appointment.patientId} borderRadius="sm" overflow="hidden"  bg={'whiteAlpha.200'} boxShadow="md" p={4} >
           <Text fontSize="sm">{appointment[1]}</Text>
           <Text fontSize="sm">Time: {new Date(appointment[0].startTime).toLocaleString()}</Text>
+
+          <Text fontSize="sm">Mode: {appointment[2]}</Text>
+
+          <Button onClick={() => handleCancel(appointment)} colorScheme="red">Cancel</Button>
          
         </Box>
       ))
@@ -154,11 +217,31 @@ function PatientAppointment() {
         <Box key={appointment.patientId} borderRadius="sm" overflow="hidden"  bg={'whiteAlpha.200'} boxShadow="md" p={4} >
           <Text fontSize="sm">{appointment[1]}</Text>
           <Text fontSize="sm">Time: {appointment[0].startTime}</Text>
-          <Button onClick={() => consult(appointment.patientId)} colorScheme="teal">Consult</Button>
+         
         </Box>
       ))
     )}
     </HStack>
+
+    <Text fontSize={'24px'} color={'black'}>Cancelled Appointments</Text>
+    <HStack gap={6}>
+    {cancelledAppointment.length === 0 ? (
+      <Text fontSize="sm">No cancelled appointments</Text>
+    ) : (
+      cancelledAppointment.map((appointment) => (
+        <Box key={appointment.patientId} borderRadius="sm" overflow="hidden"  bg={'whiteAlpha.200'} boxShadow="md" p={4} >
+          <Text fontSize="sm">{appointment[1]}</Text>
+          <Text fontSize="sm">Time: {appointment[0].startTime}</Text>
+
+          <Text fontSize="sm">Mode: {appointment[2]}</Text>
+
+          
+
+        </Box>
+      ))
+    )}
+    </HStack>
+
            
           </VStack>
         </>
