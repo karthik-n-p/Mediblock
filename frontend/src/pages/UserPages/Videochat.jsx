@@ -42,9 +42,9 @@ function Videochat() {
   }, [roomId]);
 
   return (
-    <Box w={'100px'} h={'100px'}>
+    <Box >
       <div ref={elementRef}></div>
-     <Box w="500px" h={'500px'} bg={'red'}>
+     <Box >
 
      </Box>
     </Box>
