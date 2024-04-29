@@ -1,179 +1,135 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import {
-  Box,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  FormHelperText,
+  Input,
+  Select,
+  NumberInput,
+  Textarea,
   Button,
-  Center,
+  Box,
   Heading,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
   VStack,
-} from "@chakra-ui/react";
-import { FaRegCalendarPlus } from "react-icons/fa";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+} from '@chakra-ui/react';
 
-const DoctorDashboard = () => {
-  const [pendingAppointments, setPendingAppointments] = useState([
-    {
-      id: 1,
-      timeSlot: "10:00 AM",
-      patientName: "John Doe",
-      reason: "Checkup",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 2,
-      timeSlot: "11:00 AM",
-      patientName: "Jane Smith",
-      reason: "Follow-up",
-      paymentStatus: "Pending",
-    },
-    {
-      id: 3,
-      timeSlot: "12:00 PM",
-      patientName: "Alice Johnson",
-      reason: "Consultation",
-      paymentStatus: "Paid",
-    },
-  ]);
+const medications = [ // Replace with API call or data source
+  { id: 1, name: 'Amoxicillin' },
+  { id: 2, name: 'Ibuprofen' },
+  { id: 3, name: 'Paracetamol' },
+  // Add more medications here
+];
 
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [timeSlots, setTimeSlots] = useState([]);
+const Prescription = () => {
+  const [formData, setFormData] = useState({
+    patientName: '',
+    medicationName: '', // Changed from medicationId to medicationName
+    dosage: '',
+    instructions: '',
+    dosesPerDay: 1, // Initial dose per day
+  });
 
-  const handleReschedule = (appointmentId) => {
-    console.log("Reschedule appointment with ID:", appointmentId);
+  const [medicationList, setMedicationList] = useState([]);
+
+  // Fetch medication list on component mount (replace with your logic)
+  useEffect(() => {
+    setMedicationList(medications); // Replace with actual data fetching
+  }, []);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleViewDetails = (appointmentId) => {
-    console.log("View details of appointment with ID:", appointmentId);
-  };
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
-  const handleAddAppointmentSlot = () => {
-    console.log("Adding new appointment slot");
-  };
+    // Send form data to backend (replace with your logic)
+    console.log('Prescription submitted:', formData);
 
-  const handlePrescribeMedication = (patientId) => {
-    console.log("Prescribe medication for patient with ID:", patientId);
-  };
-
-  const handleAddTimeSlot = () => {
-    if (selectedDate) {
-      const slots = [];
-      let startTime = new Date(selectedDate);
-      startTime.setHours(9); // Start time: 9:00 AM
-      startTime.setMinutes(0);
-
-      for (let i = 0; i < 24; i++) {
-        slots.push(new Date(startTime.getTime() + i * 30 * 60 * 1000)); // Add 30 minutes to the start time
-      }
-      setTimeSlots(slots);
-    }
-  };
-
-  const handleSaveSlots = () => {
-    console.log("Saving time slots:", timeSlots);
-    // Add logic to save the time slots
+    // Clear form after submission (optional)
+    setFormData({
+      patientName: '',
+      medicationName: '',
+      dosage: '',
+      instructions: '',
+      dosesPerDay: 1,
+    });
   };
 
   return (
-    <Center h="100vh">
-      <Box p="6" w="80%" bg="black" color="white" borderRadius="lg">
-        <Heading mb="6" textAlign="center">
-          Doctor Dashboard
-        </Heading>
-        <Tabs isLazy>
-          <TabList>
-            <Tab>Pending Appointments</Tab>
-            <Tab>Appointed Patients</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <VStack align="stretch" spacing="4">
-                {pendingAppointments.map((appointment) => (
-                  <Box
-                    key={appointment.id}
-                    p="4"
-                    bg="gray.800"
-                    boxShadow="md"
-                    borderRadius="md"
-                  >
-                    <Text fontWeight="bold">Patient: {appointment.patientName}</Text>
-                    <Text>Time Slot: {appointment.timeSlot}</Text>
-                    <Text>Reason: {appointment.reason}</Text>
-                    <Text>Payment Status: {appointment.paymentStatus}</Text>
-                    <Button
-                      colorScheme="blue"
-                      mt="2"
-                      onClick={() => handleViewDetails(appointment.id)}
-                    >
-                      View Details
-                    </Button>
-                    <Button
-                      colorScheme="yellow"
-                      mt="2"
-                      onClick={() => handleReschedule(appointment.id)}
-                    >
-                      Reschedule
-                    </Button>
-                  </Box>
-                ))}
-              </VStack>
-            </TabPanel>
-            <TabPanel>
-              <VStack align="stretch" spacing="4">
-                <Box p="4" bg="gray.800" boxShadow="md" borderRadius="md">
-                  <Heading size="md">Create Appointment Slot</Heading>
-                  <Box mb="4">
-                    <DatePicker
-                      selected={selectedDate}
-                      onChange={(date) => setSelectedDate(date)}
-                      minDate={new Date()}
-                      placeholderText="Select Date"
-                      dateFormat="dd/MM/yyyy"
-                      className="form-control"
-                    />
-                  </Box>
-                  <Button
-                    colorScheme="green"
-                    onClick={handleAddTimeSlot}
-                    disabled={!selectedDate}
-                    mb="4"
-                  >
-                    Add Time Slots
-                  </Button>
-                  {timeSlots.length > 0 && (
-                    <>
-                      <Heading size="sm">Time Slots</Heading>
-                      {timeSlots.map((slot, index) => (
-                        <Text key={index}>{slot.toLocaleTimeString()}</Text>
-                      ))}
-                      <Button colorScheme="blue" mt="4" onClick={handleSaveSlots}>
-                        Save Time Slots
-                      </Button>
-                    </>
-                  )}
-                </Box>
-              </VStack>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-        <Center mt="6">
-          <Button
-            colorScheme="green"
-            leftIcon={<FaRegCalendarPlus />}
-            onClick={handleAddAppointmentSlot}
+    <Box maxW="500px" mx="auto" mt={4}>
+      <Heading as="h6" size="md" mb={4}>
+        Prescription Form
+      </Heading>
+      <VStack spacing={4}>
+        <FormControl isRequired isInvalid={!formData.patientName}>
+          <FormLabel htmlFor="patientName">Patient Name</FormLabel>
+          <Input
+            id="patientName"
+            name="patientName"
+            value={formData.patientName}
+            onChange={handleChange}
+          />
+          <FormErrorMessage>Patient Name is required</FormErrorMessage>
+        </FormControl>
+        <FormControl>
+          <FormLabel htmlFor="medicationName">Medication</FormLabel>
+          <Select
+            id="medicationName"
+            name="medicationName"
+            value={formData.medicationName}
+            onChange={handleChange}
           >
-            Add Appointment Slot
-          </Button>
-        </Center>
-      </Box>
-    </Center>
+            <option value="">Select or Enter Medication</option>
+            {medicationList.map((medication) => (
+              <option key={medication.id} value={medication.name}>
+                {medication.name}
+              </option>
+            ))}
+          </Select>
+          <FormHelperText>
+            If the medication is not listed, enter the name manually.
+          </FormHelperText>
+        </FormControl>
+        <Box display="flex" justifyContent="space-between">
+          <FormControl isRequired isInvalid={!formData.dosage}>
+            <FormLabel htmlFor="dosage">Dosage</FormLabel>
+            <FormHelperText>e.g., 500mg tablet</FormHelperText>
+            <Input id="dosage" name="dosage" value={formData.dosage} onChange={handleChange} />
+            <FormErrorMessage>Dosage is required</FormErrorMessage>
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="dosesPerDay">Doses per Day</FormLabel>
+            <NumberInput
+              id="dosesPerDay"
+              name="dosesPerDay"
+              value={formData.dosesPerDay}
+              onChange={(value) => setFormData({ ...formData, dosesPerDay: value })}
+              min={1}
+              max={4} // Adjust max as needed
+              step={1}
+            />
+          </FormControl>
+        </Box>
+        <FormControl isRequired isInvalid={!formData.instructions}>
+          <FormLabel htmlFor="instructions">Instructions</FormLabel>
+          <Textarea
+            id="instructions"
+            name="instructions"
+            value={formData.instructions}
+            onChange={handleChange}
+            rows={4}
+          />
+          <FormErrorMessage>Instructions are required</FormErrorMessage>
+        </FormControl>
+        <Button type="submit" colorScheme="blue" onClick={handleSubmit}>
+          Submit Prescription
+        </Button>
+      </VStack>
+    </Box>
   );
 };
 
-export default DoctorDashboard;
+export default Prescription;

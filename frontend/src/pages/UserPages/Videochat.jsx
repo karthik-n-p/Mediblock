@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { useParams } from "react-router-dom";
-import { Box, Text } from "@chakra-ui/react";
+import Prescription from "./Resources"; // Import the Prescription component
 
 function Videochat() {
   const { roomId } = useParams();
@@ -17,8 +17,6 @@ function Videochat() {
         roomId,
         Date.now().toString(),
         "test"
-
-
       );
       const zc = ZegoUIKitPrebuilt.create(kitToken);
       zc.joinRoom({
@@ -42,12 +40,14 @@ function Videochat() {
   }, [roomId]);
 
   return (
-    <Box >
-      <div ref={elementRef}></div>
-     <Box >
-
-     </Box>
-    </Box>
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div style={{ flex: 1 }}>
+        <div ref={elementRef}></div>
+      </div>
+      <div style={{ flex: 1 }}>
+        <Prescription /> {/* Render the Prescription component */}
+      </div>
+    </div>
   );
 }
 
