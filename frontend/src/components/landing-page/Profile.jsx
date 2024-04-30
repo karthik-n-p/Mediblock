@@ -32,11 +32,16 @@ function Profile() {
 
     React.useEffect(() => {
         
-
+  
+    
 
       const fetchPatients = async () => {
           try {
-            const patientsCollection = await axios.get(`http://localhost:3000/past-appointments-patient/${username}`);
+            if (!username) {
+              // console.error('Error fetching patients: Username is not available');
+              return;
+          }
+            const patientsCollection = await axios.get(`http://localhost:5173/past-appointments-patient/${username}`);
             //divide futrue array into 2 arrays first 4 and last 4 and combine them as array of arrays
             console.log("patientsCollection",patientsCollection.data);
 
@@ -69,7 +74,7 @@ function Profile() {
           }
         };
         fetchPatients();
-    }, [name]);
+    }, [username]);
 
     let appointmentData = [];
 
@@ -264,3 +269,6 @@ if (presentAppointments.length > 0) {
 }
 
 export default Profile;
+
+
+

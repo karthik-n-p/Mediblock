@@ -11,7 +11,7 @@ function Clinic() {
   useEffect(() => {
     // Fetch clinic details from the backend
     const uid = 'IgtjHPhxT1bJa3gqD7Qe4MYm7kj2'; // Replace with the actual UID
-    axios.get(`http://localhost:3000/clinics/${uid}`)
+    axios.get(`http://localhost:5173/clinics/${uid}`)
       .then(response => {
         setClinic(response.data);
         setLoading(false);
@@ -22,7 +22,7 @@ function Clinic() {
       });
 
     // Fetch doctors in the clinic from the backend
-    axios.get(`http://localhost:3000/doctors/${uid}`)
+    axios.get(`http://localhost:5173/doctors/${uid}`)
       .then(response => {
         setDoctors(response.data);
       })
