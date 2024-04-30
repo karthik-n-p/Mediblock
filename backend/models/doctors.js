@@ -39,6 +39,10 @@ const doctorSchema = new mongoose.Schema({
   }],
 
   
+
+
+
+  
 appointment: [{ 
     patientId: String,
     patientName: String,
@@ -46,7 +50,14 @@ appointment: [{
     status: String,
     meetingLink: String,
     mode: String,
+    prescriptions: [{
+      medicationName: String,
+      dosage: String,
+      instructions: String,
+    }],
   }],
+
+
 
 
   sharedDocuments: [{ 

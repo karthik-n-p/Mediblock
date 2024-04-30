@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Button, Input, Select, Text, VStack,HStack } from "@chakra-ui/react";
+import { Box, Button, Input, Select, Text, VStack,HStack, useToast , ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Modal } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "./AuthContext";
 import axios from 'axios';
 
 const DoctorCard = ({ doctor }) => {
   const navigate = useNavigate();
+
 
   const handleBookSlot = (doctorName) => {
     navigate(`/bookslot/${doctorName}`);
@@ -18,17 +19,100 @@ const DoctorCard = ({ doctor }) => {
       </Box>
       <Text fontSize={'24px'} color={'black'}>{doctor.name}</Text>
       <Text fontSize="sm">Specialist: {doctor.specialization}</Text>
-      <Text fontSize="sm">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odit exercitationem facilis, ex eveniet laudantium incidunt officiis?</Text>
+      <Text fontSize="sm">{doctor.description}</Text>
       <Button onClick={() => handleBookSlot(doctor.name)} colorScheme="teal">Book Meeting</Button>
     </VStack>
   );
 };
 
-const PatientCard = ({pastAppointment, futureAppointment,liveAppointment,  consult }) => {
+const PatientCard = ({pastAppointment, futureAppointment,liveAppointment,cancelledAppointments,  consult }) => {
 
-  console.log("pastAppointment inside patient card",pastAppointment);
-  console.log("futureAppointment inside patient card",futureAppointment);
-  console.log("liveAppointment inside patient card",liveAppointment);
+  // console.log("pastAppointment inside patient card",pastAppointment);
+  // console.log("futureAppointment inside patient card",futureAppointment);
+  // console.log("liveAppointment inside patient card",liveAppointment);
+  const name = useContext(AuthContext).username;
+  const Toast = useToast();
+  
+  const handleCancel = async (appointmentdata) => {
+
+    console.log("appointmentdata",appointmentdata);
+
+    const meetingLink = appointmentdata[3]
+    const patientName = appointmentdata[1];
+    const doctorName = name;
+
+    console.log('Cancelling appointment:', meetingLink, doctorName, patientName);
+
+
+
+    try {
+
+      await axios.post('http://localhost:3000/cancel-appointment', {
+        meetingLink,
+        doctorName,
+        patientName,
+      });
+
+      Toast({
+        title: 'Appointment cancelled successfully',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+
+
+      
+
+      console.log('Appointment cancelled successfully');
+
+      // Reset form after submission
+
+    } catch (error) {
+      console.error('Error cancelling appointment:', error);
+    }
+
+  };
+
+
+  
+  const [showprescription, setshowprescription] = useState(false);
+
+  const [prescription, setPrescription] = useState([]);
+
+
+  const handlePrescription = (appointment) => {
+    setshowprescription(true);
+
+    const doctorName = name;
+    const meetingLink = appointment[3];
+
+    console.log('Getting prescription:', meetingLink, doctorName);
+
+    try {
+
+      axios.get(`http://localhost:3000/get-prescription-doctor/${doctorName}/${meetingLink}`)
+        .then((response) => {
+          console.log('Prescription:', response.data);
+          setPrescription(response.data);
+          
+  console.log('Prescription:', prescription);
+
+        });
+
+    } catch (error) {
+
+      console.error('Error getting prescription:', error);
+    }
+
+
+
+
+
+
+
+
+  };
+
 
 
 
@@ -64,7 +148,7 @@ const PatientCard = ({pastAppointment, futureAppointment,liveAppointment,  consu
       <Text fontSize="sm">Date: {new Date(appointment[0].startTime).toLocaleDateString()}</Text>
       <Text fontSize="sm">Time: {new Date(appointment[0].startTime).toLocaleTimeString()}</Text>
       <Text fontSize="sm">Mode: {appointment[2]}</Text>
-     
+      <Button onClick={() => handleCancel(appointment)} colorScheme="red">Cancel</Button>
     </Box>
   ))
 )}
@@ -83,11 +167,62 @@ const PatientCard = ({pastAppointment, futureAppointment,liveAppointment,  consu
       <Text fontSize="sm">Date: {new Date(appointment[0].startTime).toLocaleDateString()}</Text>
       <Text fontSize="sm">Time: {new Date(appointment[0].startTime).toLocaleTimeString()}</Text>
       <Text fontSize="sm">Mode: {appointment[2]}</Text>
+      <Button  onClick={()=>handlePrescription(appointment)} >Prescription</Button>
     
     </Box>
   ))
 )}
 </HStack>
+
+
+<Text fontSize={'24px'} color={'black'}>Cancelled Appointments</Text>
+<HStack gap={6}>
+{cancelledAppointments.length === 0 ? (
+  <Text fontSize="sm">No cancelled appointments</Text>
+) : (
+  cancelledAppointments.map((appointment) => (
+    <Box key={appointment.patientId} borderRadius="sm" overflow="hidden"  bg={'whiteAlpha.200'} boxShadow="md" p={4} >
+      <Text fontSize="sm">Name: {appointment[1]}</Text>
+      <Text fontSize="sm">Date: {new Date(appointment[0].startTime).toLocaleDateString()}</Text>
+      <Text fontSize="sm">Time: {new Date(appointment[0].startTime).toLocaleTimeString()}</Text>
+      <Text fontSize="sm">Mode: {appointment[2]}</Text>
+
+    </Box>
+  ))
+)}
+
+</HStack>
+
+
+    {/* create a modal to show prescription */}
+    <Modal isOpen={showprescription} onClose={() => setshowprescription(false)}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Prescription</ModalHeader>
+      
+        <ModalCloseButton />
+        <ModalBody>
+
+          <VStack>
+            {prescription.map((med) => (
+              <Box key={med.id} borderRadius="sm" overflow="hidden" bg={'whiteAlpha.200'} boxShadow="md" p={4} >
+                <Text fontSize="sm">Medicine: {med.medicationName}</Text>
+                <Text fontSize="sm">Dosage: {med.dosage}</Text>
+            
+                <Text fontSize="sm">Instruction: {med.instructions}</Text>
+              </Box>
+            ))}
+          </VStack>
+          
+        </ModalBody>
+        <ModalFooter>
+          <Button colorScheme="blue" mr={3} onClick={() => setshowprescription(false)}>
+            Close
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+
        
       </VStack>
     </>
@@ -110,14 +245,20 @@ const PracQues = () => {
   const [pastAppointments, setPastAppointments] = useState([]);
   const [presentAppointments, setPresentAppointments] = useState([]);
   const [futureAppointments, setFutureAppointments] = useState([]);
+  const [cancelledAppointments, setCancelledAppointments] = useState([]);
 
   useEffect(() => {
-    fetchDoctors();
 
+    setTimeout(() => {
+    fetchDoctors();
     if (isdoctor) {
       fetchPatients(username);
     }
-  }, [isdoctor, username]);
+
+    }, 500);
+
+    
+  }, [isdoctor, username,futureAppointments]);
 
   const fetchDoctors = async () => {
     try {
@@ -147,14 +288,28 @@ const PracQues = () => {
 
     //divide future appointmetns into slices of 4 and combine them as array of arrays by dividing total length by 4
 
+
+
+    let cancelled = [];
     let future = [];
-    let i,j,temparray,chunk = 4;
+    let i,j,temparray,chunk = 5;
     for (i=0,j=patientsCollection.data.FutureAppiontments.length; i<j; i+=chunk) {
         temparray = patientsCollection.data.FutureAppiontments.slice(i,i+chunk);
+        // console.log("temparray",temparray);
+        if(temparray[4] == "cancelled"){
+          cancelled.push(temparray);
+
+         
+        }
+        else{
         future.push(temparray);
+        }
+
 
     }
-    console.log("future",future);
+    // console.log("future",future);
+    // console.log("cancelled",cancelled)
+    setCancelledAppointments(cancelled);
     setFutureAppointments(future);
  
 
@@ -170,7 +325,7 @@ const PracQues = () => {
             live.push(temparray);
     
         }
-        console.log("live",live);
+        // console.log("live",live);
         setPresentAppointments(live);
     
 
@@ -188,7 +343,7 @@ const PracQues = () => {
           temparray = patientsCollection.data.pastAppointmetns.slice(i,i+chunk);
           past.push(temparray);
       }
-      console.log("past",past);
+      // console.log("past",past);
       setPastAppointments(past);
 
 
@@ -244,7 +399,7 @@ const PracQues = () => {
           <Text fontSize="lg" fontWeight="bold">Appoinments</Text>
         <HStack templateColumns="repeat(3, 1fr)" gap={6}>
           
-          <PatientCard pastAppointment={pastAppointments} futureAppointment={futureAppointments} liveAppointment={presentAppointments} consult={handleConsult} />
+          <PatientCard pastAppointment={pastAppointments} futureAppointment={futureAppointments} liveAppointment={presentAppointments} cancelledAppointments={cancelledAppointments} consult={handleConsult} />
           
         </HStack>
         </Box>

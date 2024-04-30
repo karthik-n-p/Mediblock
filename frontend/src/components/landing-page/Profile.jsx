@@ -28,7 +28,11 @@ function Profile() {
     const [patients, setPatients] = React.useState([]);
     const [futureAppointments, setFutureAppointments] = React.useState([]);
     const [presentAppointments, setPresentAppointments] = React.useState([]);
-
+    const [steps, setSteps] = React.useState([]);
+    const [weight, setWeight] = React.useState([]);
+    const [distance, setDistance] = React.useState([]);
+    const [dates, setDates] = React.useState([]);
+    const [bpm, setBpm] = React.useState([]);
 
     React.useEffect(() => {
         
@@ -85,16 +89,70 @@ if (presentAppointments.length > 0) {
   appointmentData = futureAppointments;
 } 
     
+useEffect(() => {
+  const fetchSheetData = async () => {
+    const SPREADSHEET_ID = '1FhZVjp-vLu4pes2Z2UGYS9kfXEIOOcSVa3OUMrsxImM'; // Replace with your actual spreadsheet ID
+const SHEET_NAME = 'History'; // Replace with the actual name of your sheet if it's different
+const API_KEY = 'AIzaSyDZ8Jd8Z2vYK8aVYyr6QHpg7uvwYKBIH0k'; // Replace with your actual API key
 
 
+    try {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}`;
+      const response = await axios.get(url, {
+        params: {
+          key: API_KEY,
+        },
+      });
+      const data = response.data.values;
+      console.log('Sheet data:', data);
 
+      // Extracting the relevant data for the charts
+      const dates = data.slice(1).map(row => row[0]); // Extract dates
+      const steps = data.slice(1).map(row => parseInt(row[1])).filter(val => !isNaN(val)); // Extract steps as integers and remove NaN values
+      const weight = data.slice(1).map(row => parseFloat(row[2])).filter(val => !isNaN(val)); // Extract weight as floats and remove NaN values
+      const distance = data.slice(1).map(row => parseFloat(row[3])).filter(val => !isNaN(val)); // Extract distance as floats and remove NaN values
+      const bpm = data.slice(1).map(row => parseFloat(row[4])).filter(val => !isNaN(val)); // Extract distance as floats and remove NaN values
+
+      console.log('bpm',bpm);
+      
+      // Update the state with the fetched data
+      setDates(dates);
+      setSteps(steps);
+      setWeight(weight);
+      setDistance(distance);
+      setBpm(bpm);
+
+    
+      
+      // Updating the state or replacing the hardcoded data in your charts
+    
+      // Process the fetched data as needed in your application
+    } catch (error) {
+      console.error('Error fetching sheet data:', error);
+    }
+  };
+  
+  // Call the function to fetch data
+  fetchSheetData();
+
+}, []);
+
+const slicedDates = dates.slice(0, 6);
+const slicedSteps = steps.slice(0, 6);
+const slicedWeight = weight.slice(0, 6);
+const slicedDistance = distance.slice(0, 6);
+
+const dayNumbers = slicedDates.map(date => {
+  const [day] = date.split('/');
+  return day;
+});
 
   // Sample data for each condition
   const bloodStatusData = {
-    labels: ['1', '2', '3', '4', '5', '6', '7'],
+    labels:dayNumbers,
     datasets: [{
       label: 'Blood Status',
-      data: [120, 110, 115, 118, 122, 125, 130],
+      data: slicedSteps,
       backgroundColor: 'rgba(255, 99, 132, 0.2)',
       borderColor: 'rgba(255, 99, 132, 1)',
       borderWidth: 1
@@ -102,10 +160,10 @@ if (presentAppointments.length > 0) {
   };
 
   const heartRateData = {
-    labels: ['1', '2', '3', '4', '5', '6', '7'],
+    labels: dayNumbers,
     datasets: [{
       label: 'Heart Rate',
-      data: [80, 85, 88, 90, 85, 82, 79],
+      data: bpm,
       backgroundColor: 'rgba(54, 162, 235, 0.2)',
       borderColor: 'rgba(54, 162, 235, 1)',
       borderWidth: 1
@@ -167,7 +225,7 @@ if (presentAppointments.length > 0) {
           <Flex p='15px' color={'white'} bg="btng" borderRadius={'20px'}>
             <FaHeart size={'20px'}  />
           </Flex>
-          <Text fontWeight={'normal'}>Heart Beat <br /> 123bpm</Text>
+          <Text fontWeight={'normal'}>Heart Beat <br /> 120bpm</Text>
 
         </HStack>
 
@@ -184,7 +242,7 @@ if (presentAppointments.length > 0) {
           <VStack spacing="10px">
             <Heading alignSelf={'flex-start'} fontSize="32px" lineHeight={'40px'} fontWeight="normal" color="black">My Heart Condition</Heading>
             <HStack spacing="20px" alignItems="center">
-              <Feature title="Blood Status" value={'116/70'} icon={FaChartBar} chartData={bloodStatusData} chartType={'line'} />
+            <Feature title="Steps" value={'Steps Value'} icon={FaChartBar} chartData={bloodStatusData} chartType={'line'} />
               <Feature title="Heart Rate" value={'120bpm'} icon={FaChartLine} chartData={heartRateData} chartType={'line'} />
             </HStack>
             <HStack spacing="20px" alignItems="center">
@@ -195,9 +253,7 @@ if (presentAppointments.length > 0) {
           <VStack spacing="10px" alignSelf={'flex-start'}>
             <Heading alignSelf={'flex-start'} fontSize={'32px'} lineHeight={'40px'} fontWeight="normal" color="black">My Appointments</Heading>
             <VStack spacing="10px">
-  <Heading alignSelf="flex-start" fontSize="32px" lineHeight="40px" fontWeight="normal" color="black">
-    My Appointments
-  </Heading>
+
   {appointmentData.length > 0 ? (
     <VStack display="flex" flexDirection="column" gap="10px" bg="white" borderRadius="30px" p="20px">
       <HStack alignSelf="flex-start">
@@ -228,7 +284,7 @@ if (presentAppointments.length > 0) {
   ) : (
     <VStack display="flex" flexDirection="column" gap="10px" bg="white" borderRadius="30px" p="20px">
       <Text fontWeight="normal">No appointments available.</Text>
-      <Link to="/book-appointment">
+      <Link to="/appointment">
         <Button alignSelf="flex-start" justifyContent="space-between" w="200px" h="40px" color="white" bg="btng">
           <Text>Book Appointment</Text>
           <FaChevronRight size="20px" />  
@@ -239,30 +295,7 @@ if (presentAppointments.length > 0) {
 </VStack>
           </VStack>
         </HStack>
-        <Heading alignSelf={'flex-start'} fontSize="32px" lineHeight={'40px'} fontWeight="normal" color="black">My Body Conditions</Heading>
-        <HStack spacing="20px" alignItems="center" pb="20px">
-          <Box position={'relative'} bg="bg" borderRadius={'30px'} p={'10px'} border='3px solid white' alignItems={'center'} justifyContent={'center'}>
-            <Image src={LandingPic} alt="LandingPic" w={'200px'} />
-            <HStack pos={'absolute'} bottom={'0px'} right={'0px'} left={'0px'} border={'3px solid white'} borderRadius={'30px'} p={'10px'} alignItems={'center'} justifyContent={'space-between'}>
-              <Text>My Heart</Text>
-              <FaChevronCircleRight size={'20px'} />
-            </HStack>
-          </Box>
-          <Box position={'relative'} bg="bg" borderRadius={'30px'} p={'10px'} border='3px solid white' alignItems={'center'} justifyContent={'center'}>
-            <Image src={'https://cdn3d.iconscout.com/3d/premium/thumb/lungs-organ-5687741-4744099.png?f=webp'} alt="LandingPic" w={'200px'} />
-            <HStack pos={'absolute'} bottom={'0px'} right={'0px'} left={'0px'} border={'3px solid white'} borderRadius={'30px'} p={'10px'} alignItems={'center'} justifyContent={'space-between'}>
-              <Text>My Lungs</Text>
-              <FaChevronCircleRight size={'20px'} />
-            </HStack>
-          </Box>
-          <Box position={'relative'} bg="bg" borderRadius={'30px'} p={'10px'} border='3px solid white' alignItems={'center'} justifyContent={'center'}>
-            <Image src={'https://static.vecteezy.com/system/resources/previews/023/638/069/original/3d-flow-red-blood-cells-iron-platelets-erythrocyte-anemia-realistic-medical-analysis-illustration-isolated-transparent-background-png.png'} alt="LandingPic" w={'200px'} />
-            <HStack pos={'absolute'} bottom={'0px'} right={'0px'} left={'0px'} border={'3px solid white'} borderRadius={'30px'} p={'10px'} alignItems={'center'} justifyContent={'space-between'}>
-              <Text>My Blood</Text>
-              <FaChevronCircleRight size={'20px'} />
-            </HStack>
-          </Box>
-        </HStack>
+        
       </VStack>
     </Box>
   );

@@ -27,6 +27,14 @@ app.use(express.json());
 require('dotenv').config();
 
 
+const nodemailer = require('nodemailer');
+
+
+
+
+
+
+
 const api = process.env.x
 console.log(api);
 
@@ -803,6 +811,11 @@ const Clinic = require('./models/clinic');
         let { doctorName, startTime, endTime, patientName, mode ,meetingLink } = req.body;
         console.log("doctorName",doctorName, "startTime",startTime, "endTime",endTime, "patientName",patientName, "mode",mode, "meetingLink",meetingLink)
 
+
+
+
+
+
         
         
         // Find the doctor document with the doctor name
@@ -853,6 +866,14 @@ const Clinic = require('./models/clinic');
           }
         }
 
+        //create a sample json  for testing in postman for the booked slot for past appointments
+
+      
+
+        //
+
+
+
 
         
 
@@ -892,10 +913,50 @@ const Clinic = require('./models/clinic');
           else{
             //upate the number of offline appointments for the doctor
             doctor.numberofofflineAppointments = doctor. numberofofflineAppointments + 1;
-            doctor.appointment.push({ patientName, bookedSlot: { date, startTime, endTime }, status: 'booked', mode: 'offline' });
-            patient.appointments.push({ doctorName, bookedSlot: { date, startTime, endTime }, status: 'booked', mode: 'offline' });
+            doctor.appointment.push({ patientName, bookedSlot: {  startTime, endTime }, status: 'booked', mode: 'offline',meetingLink });
+            patient.appointments.push({ doctorName, bookedSlot: {  startTime, endTime }, status: 'booked', mode: 'offline' ,meetingLink});
 
           }
+
+
+          
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            auth: {
+              user: 'karthiknp554@gmail.com',
+              pass: 'odoe wpqi eaem lytc'
+            }
+          });
+
+          const mailOptions = {
+
+            from: 'karthiknp554@gmail.com',
+            to: patient.email,
+            subject: 'Prescription Details',
+            text:  'Your appointment has been booked successfully. Please click on the link to join the meeting: '
+          };
+
+
+          transporter.sendMail(mailOptions, function(error, info){
+              
+              if (error) {
+                console.log(error);
+              }
+  
+              else {
+  
+                console.log('Email sent: ' + info.response);
+  
+              }
+  
+            }
+
+          );
+
+
 
           await doctor.save();
 
@@ -903,6 +964,15 @@ const Clinic = require('./models/clinic');
 
 
           //upate the patient details in the patient collection
+
+
+          //send email to the patient with the meeting link
+
+        
+
+
+
+
 
        
 
@@ -1304,16 +1374,16 @@ const Clinic = require('./models/clinic');
 
           for (let i = 0; i < doctor.appointment.length ; i++) {  
             const timeSlot = doctor.appointment[i].bookedSlot; // Assuming timeSlots is an array
-            console.log("timeSlot",doctor.appointment[i]);
+          
          
   
             for(let j = 0; j < timeSlot.length; j++){
               const slot = timeSlot[j];
           
               const startTime1 = new Date(slot.startTime);
-              console.log("startTime1",startTime1);
+             
               const endTime1 = new Date(slot.endTime);
-              console.log("endTime1",endTime1);
+             
 
               if (currentDate.getTime()>endTime1.getTime()) {
                 //if slot is already present in the past appointment then continue
@@ -1331,6 +1401,7 @@ const Clinic = require('./models/clinic');
                   pastAppointmetns.push(doctor.appointment[i].patientName);
                   pastAppointmetns.push(doctor.appointment[i].mode);
                   pastAppointmetns.push(doctor.appointment[i].meetingLink);
+                  
 
 
                 }
@@ -1352,6 +1423,7 @@ const Clinic = require('./models/clinic');
                   FutureAppiontments.push(Name = doctor.appointment[i].patientName);
                   FutureAppiontments.push(Mode =doctor.appointment[i].mode);
                   FutureAppiontments.push(meetingLink = doctor.appointment[i].meetingLink);
+                  FutureAppiontments.push(doctor.appointment[i].status);
                   }
                   
 
@@ -1389,9 +1461,7 @@ const Clinic = require('./models/clinic');
           
 
           } 
-          console.log("pastAppointmetns",pastAppointmetns);
-          console.log("FutureAppiontments",FutureAppiontments);
-          console.log("LiveAppointments",LiveAppointments);
+       
 
           //create a key value pair for past, future and live appointments
 
@@ -1401,7 +1471,7 @@ const Clinic = require('./models/clinic');
             LiveAppointments
           };
 
-          console.log("allAppointments",allAppointments);
+       
 
           //return the key value pair
           res.status(200).json(allAppointments);
@@ -1452,15 +1522,14 @@ const Clinic = require('./models/clinic');
 
           for (let i = 0; i < patient.appointments.length ; i++) {
             const timeSlot = patient.appointments[i].bookedSlot; // Assuming timeSlots is an array
-            console.log("timeSlot",patient.appointments[i]);
-         
+          
             for(let j = 0; j < timeSlot.length; j++){
               const slot = timeSlot[j];
           
               const startTime1 = new Date(slot.startTime);
-              console.log("startTime1",startTime1);
+          
               const endTime1 = new Date(slot.endTime);
-              console.log("endTime1",endTime1);
+             
 
               if (currentDate.getTime()>endTime1.getTime()) {
                 //if slot is already present in the past appointment then continue
@@ -1499,6 +1568,7 @@ const Clinic = require('./models/clinic');
                   FutureAppiontments.push(Name = patient.appointments[i].doctorName);
                   FutureAppiontments.push(Mode =patient.appointments[i].mode);
                   FutureAppiontments.push(meetingLink = patient.appointments[i].meetingLink);
+                  FutureAppiontments.push(patient.appointments[i].status);
                   }
                   
 
@@ -1535,9 +1605,7 @@ const Clinic = require('./models/clinic');
 
           }
 
-          console.log("pastAppointmetns",pastAppointmetns);
-          console.log("FutureAppiontments",FutureAppiontments);
-          console.log("LiveAppointments",LiveAppointments);
+         
 
           //create a key value pair for past, future and live appointments
 
@@ -1547,7 +1615,7 @@ const Clinic = require('./models/clinic');
             LiveAppointments
           };
 
-          console.log("allAppointments",allAppointments);
+    
 
           //return the key value pair
 
@@ -1564,6 +1632,304 @@ const Clinic = require('./models/clinic');
     }
       
       );
+
+
+
+      //Endpoint to save the prescription details in MongoDB
+
+      app.post('/save-prescription', async (req, res) => {
+
+        try {
+
+          const { doctorName, patientName, prescription ,meetingLink } = req.body;
+
+          console.log("doctorName",doctorName, "patientName",patientName, "prescription",prescription);
+
+          // Find the doctor document with the doctor name
+
+          const doctor = await Doctor.findOne({ name: doctorName });
+
+          if (!doctor) {
+            return res.status(404).json({ success: false, error: 'Doctor not found' });
+          }
+
+
+
+          // Find the patient document with the patient name
+
+          const patient = await Patient .findOne({ name: patientName });
+
+          if (!patient) {
+            return res.status(404).json({ success: false, error: 'Patient not found' });
+          }
+
+          // Find the appointment with meeting link and to that appointment add the prescription details
+
+          for (let i = 0; i < patient.appointments.length ; i++) {
+            const appointment = patient.appointments[i];
+
+            if (appointment.meetingLink === meetingLink) {
+              appointment.prescriptions = prescription;
+              break;
+            }
+          }
+
+          //send email to the patient with the prescription details 
+
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            auth: {
+              user: 'karthiknp554@gmail.com',
+              pass: 'odoe wpqi eaem lytc'
+            }
+          });
+
+          const mailOptions = {
+
+            from: 'karthiknp554@gmail.com',
+            to: patient.email,
+            subject: 'Prescription Details',
+            text: `Your prescription details are as follows: Medication Name: ${prescription.medicationName}, Dosage: ${prescription.dosage}, Instructions: ${prescription.instructions}.`,
+          };
+
+
+          transporter.sendMail(mailOptions, function(error, info){
+              
+              if (error) {
+                console.log(error);
+              }
+  
+              else {
+  
+                console.log('Email sent: ' + info.response);
+  
+              }
+  
+            }
+
+          );
+
+
+        
+
+
+          await patient.save();
+
+          // Update the doctor's document to save prescription details same as above
+
+          for (let i = 0; i < doctor.appointment.length ; i++) {
+            const appointment = doctor.appointment[i];
+
+            if (appointment.meetingLink === meetingLink) {
+              appointment.prescriptions = prescription;
+              break;
+            }
+          }
+
+          await doctor.save();
+
+
+
+
+          res.status(200).json({ success: true });
+
+
+        } catch (error) {
+
+          console.error('Error saving prescription:', error);
+
+          res.status(500).json({ success: false, error: 'Failed to save prescription' });
+
+        }
+
+      }
+    );
+
+    //genrate a json for testing in postman for the prescription details
+
+    // {
+    //   "doctorName": "Dr Raghav",
+    //   "patientName": "karthik",
+    //   "prescription": {
+    //       "medicationName": "Paracetamol",
+    //       "dosage": "4/day",
+    //       "instructions": "Blood Test"
+    //   }
+    // }
+
+
+
+
+    //endpoint to fetch prescription details for a specific patient and for a specific appointment from MongoDB
+
+    app.get('/get-prescription/:patientName/:meetingLink', async (req, res) => {
+        
+        try {
+  
+          const { patientName, meetingLink } = req.params;
+
+          console.log("",patientName, meetingLink)
+  
+          // Find the patient document with the patient name
+  
+          const patient = await Patient
+          .findOne({ name: patientName });
+
+          if (!patient) {
+            return res.status(404).json({ success: false, error: 'Patient not found' });
+          }
+
+          // Find the appointment with the meeting link
+
+          const appointment = patient.appointments.find(appointment => appointment.meetingLink === meetingLink);
+
+          if (!appointment) {
+            return res.status(404).json({ success: false, error: 'Appointment not found' });
+          }
+
+          res.status(200).json(appointment.prescriptions);
+
+        } catch (error) {
+
+          console.error('Error fetching prescription:', error);
+
+          res.status(500).json({ error: 'Failed to fetch prescription' });
+
+        }
+
+      }
+
+    );
+
+    //endpoint to fetch prescription details for a specific doctor and for a specific appointment from MongoDB
+
+    app.get('/get-prescription-doctor/:doctorName/:meetingLink', async (req, res) => {
+          
+          try {
+    
+            const { doctorName, meetingLink } = req.params;
+            console.log("doctorName in doc",doctorName, "meetingLink",meetingLink);
+    
+            // Find the doctor document with the doctor name
+            
+            const doctor = await Doctor.findOne({name:doctorName});
+    
+         
+  
+            if (!doctor) {
+              return res.status(404).json({ success: false, error: 'Doctor not found' });
+            }
+  
+            // Find the appointment with the meeting link
+  
+            const appointment = doctor.appointment.find(appointment => appointment.meetingLink === meetingLink);
+  
+            if (!appointment) {
+              return res.status(404).json({ success: false, error: 'Appointment not found' });
+            }
+  
+            res.status(200).json(appointment.prescriptions);
+  
+          } catch (error) {
+  
+            console.error('Error fetching prescription:', error);
+  
+            res.status(500).json({ error: 'Failed to fetch prescription' });
+  
+          }
+  
+        }
+
+      );
+
+
+
+
+    //Endpoint to cancel a booked appointment for a specific patient from MongoDB
+
+    app.post('/cancel-appointment', async (req, res) => {
+
+      try {
+        
+          const { doctorName, patientName, meetingLink } = req.body;
+
+         
+  
+          // Find the doctor document with the doctor name
+  
+          const doctor = await Doctor.findOne
+          ({ name: doctorName });
+
+          if (!doctor) {
+            return res.status(404).json({ success: false, error: 'Doctor not found' });
+          }
+
+          // Find the patient document with the patient name
+
+          const patient = await Patient
+          .findOne({ name: patientName });
+
+          if (!patient) {
+
+            return res.status(404).json({ success: false, error: 'Patient not found' });
+
+          }
+
+          // Find the appointment with the meeting link
+
+          const appointment = patient.appointments.find(appointment => appointment.meetingLink === meetingLink);
+
+          if (!appointment) {
+            return res.status(404).json({ success: false, error: 'Appointment not found' });
+          }
+
+          // set the status of the appointment to cancelled
+
+          appointment.status = 'cancelled';
+
+          // Find the appointment with the meeting link in the doctor's document
+
+          const doctorAppointment = doctor.appointment.find(appointment => appointment.meetingLink === meetingLink);
+
+          if (!doctorAppointment) {
+
+            return res.status(404).json({ success: false, error: 'Doctor appointment not found' });
+
+          }
+
+          // set the status of the appointment to cancelled
+
+          doctorAppointment.status = 'cancelled';
+
+          await patient.save();
+
+          await doctor.save();
+
+          res.status(200).json({ success: true });
+
+        } catch (error) {
+
+          console.error('Error canceling appointment:', error);
+
+          res.status(500).json({ success: false, error: 'Failed to cancel appointment' });
+
+        }
+
+      }
+
+    );
+
+
+
+
+
+
+
+
+
 
 
 

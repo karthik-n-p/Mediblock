@@ -20,6 +20,11 @@ const patientSchema = new mongoose.Schema({
     status: String,
     mode: String,
     meetingLink: String,
+    prescriptions: [{
+      medicationName: String,
+      dosage: String,
+      instructions: String,
+    }],
 
   }],
   
@@ -29,6 +34,8 @@ const patientSchema = new mongoose.Schema({
     doctorName: String,
    
   }],
+
+  
 });
 
 const Patient = mongoose.model('Patient', patientSchema);

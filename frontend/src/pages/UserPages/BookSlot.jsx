@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, HStack, Text, Toast, VStack } from '@chakra-ui/react';
+import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import { doc } from 'firebase/firestore';
 import { auth } from './firebase-auth';
 import AuthContext from './AuthContext';
+import { useToast } from "@chakra-ui/react";
 
 
 function BookSlot() {
@@ -19,6 +20,7 @@ function BookSlot() {
 
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [appointmentMode, setAppointmentMode] = useState('online');
+  const Toast = useToast();
 
   const {  username } = React.useContext(AuthContext);
   //set user name from local storage
@@ -140,14 +142,15 @@ function BookSlot() {
       patientName: patientName,
 
     });
-    console.log(respone.data);
-    if(respone.data === "success"){
+    console.log("hekk",respone.data.success);
+    if(respone.data.success){
       Toast({
         title: "Appointment booked successfully",
         status: "success",
         duration: 2000,
         isClosable: true,
       });
+
 
 
     }else{
@@ -177,16 +180,18 @@ function BookSlot() {
 
   return (
     <Box bg={'bg'} pt='10px' display="flex" flexDirection={'column'} height={'80vh'} alignItems="center" justifyContent={'center'}>
-      <VStack p={10} spacing={4}>
-        <Text fontSize={'2xl'} fontWeight={'400'}>Book Appointment</Text>
-        <Text fontSize={'1xl'} fontWeight={'200'}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odit exercitationem facilis, ex eveniet laudantium incidunt officiis?</Text>
-        <Text fontSize={'1xl'} fontWeight={'200'}>Choose Date</Text>
+      <VStack p={10} spacing={4} >
+        <Text color={'black'} fontSize={'2xl'} fontWeight={'400'}>Book Appointment</Text>
+        <Text color={'black'} fontSize={'1xl'} fontWeight={'200'}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odit exercitationem facilis, ex eveniet laudantium incidunt officiis?</Text>
+        <Text color={'black'} fontSize={'1xl'} fontWeight={'200'}>Choose Date</Text>
         <Calendar
+       
+     
           onChange={handleDateChange}
           value={selectedDate}
           tileDisabled={tileDisabled}
         />
-        <Text fontSize={'1xl'} fontWeight={'200'}>Available Time Slots:</Text>
+        <Text color={'black'} fontSize={'1xl'} fontWeight={'200'}>Available Time Slots:</Text>
         <HStack spacing={2}>
           {timeSlots.map((slot, index) => (
             console.log("slonroot",slot),
@@ -196,28 +201,29 @@ function BookSlot() {
             <Button   
             onClick={() => handleTimeSlotSelection(slot)}
             isDisabled={!slot.availability}
-            colorScheme={selectedTimeSlot === slot ? 'blue' : 'bg'}
+            colorScheme={selectedTimeSlot === slot ? 'blue' : 'blue'}
             variant={selectedTimeSlot === slot ? 'solid' : 'outline'}
               p={5} borderRadius={'md'}
                key={index}>{new Date(slot.startTime).toLocaleTimeString()} - {new Date(slot.endTime).toLocaleTimeString()}</Button>
           ))}
         </HStack>
 
-        <Text fontSize={'1xl'} fontWeight={'200'}>Choose Appointment Mode:</Text>
+        <Text color={'black'} fontSize={'1xl'} fontWeight={'200'}>Choose Appointment Mode:</Text>
 
         <HStack spacing={2}>
           <Button
             onClick={() => setAppointmentMode('online')}
-            colorScheme={appointmentMode === 'online' ? 'blue' : 'bg'}
+            colorScheme={appointmentMode === 'online' ? 'blue' : 'blue'}
             variant={appointmentMode === 'online' ? 'solid' : 'outline'}
+         
             p={5} borderRadius={'md'}>Online</Button>
           <Button
             onClick={() => setAppointmentMode('offline')}
-            colorScheme={appointmentMode === 'offline' ? 'blue' : 'bg'}
+            colorScheme={appointmentMode === 'offline' ? 'blue' : 'blue'}
             variant={appointmentMode === 'offline' ? 'solid' : 'outline'}
             p={5} borderRadius={'md'}>Offline</Button>
         </HStack>
-        <Button  onClick={handlebooking} colorScheme={'teal'}>Book Appointment</Button>
+        <Button  onClick={handlebooking} colorScheme={'blue'}>Book Appointment</Button>
 
 
 
