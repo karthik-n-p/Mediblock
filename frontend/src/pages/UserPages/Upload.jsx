@@ -85,7 +85,7 @@ const { username } = React.useContext(AuthContext);
   
     // Cleanup function to clear the interval
     return () => clearInterval(fetchDataInterval);
-  }, [uploadedFiles]);
+  }, [uploadedFiles      ]);
   
 
   const handleFileChange = (event) => {

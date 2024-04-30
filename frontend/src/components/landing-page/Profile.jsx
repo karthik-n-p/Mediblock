@@ -32,6 +32,7 @@ function Profile() {
     const [weight, setWeight] = React.useState([]);
     const [distance, setDistance] = React.useState([]);
     const [dates, setDates] = React.useState([]);
+    const [bpm, setBpm] = React.useState([]);
 
     React.useEffect(() => {
         
@@ -105,12 +106,19 @@ const API_KEY = 'AIzaSyDZ8Jd8Z2vYK8aVYyr6QHpg7uvwYKBIH0k'; // Replace with your 
       const steps = data.slice(1).map(row => parseInt(row[1])).filter(val => !isNaN(val)); // Extract steps as integers and remove NaN values
       const weight = data.slice(1).map(row => parseFloat(row[2])).filter(val => !isNaN(val)); // Extract weight as floats and remove NaN values
       const distance = data.slice(1).map(row => parseFloat(row[3])).filter(val => !isNaN(val)); // Extract distance as floats and remove NaN values
+      const bpm = data.slice(1).map(row => parseFloat(row[4])).filter(val => !isNaN(val)); // Extract distance as floats and remove NaN values
+
+      console.log('bpm',bpm);
       
       // Update the state with the fetched data
       setDates(dates);
       setSteps(steps);
       setWeight(weight);
       setDistance(distance);
+      setBpm(bpm);
+
+    
+      
       // Updating the state or replacing the hardcoded data in your charts
     
       // Process the fetched data as needed in your application
@@ -147,10 +155,10 @@ const dayNumbers = slicedDates.map(date => {
   };
 
   const heartRateData = {
-    labels: ['1', '2', '3', '4', '5', '6', '7'],
+    labels: dayNumbers,
     datasets: [{
       label: 'Heart Rate',
-      data: [80, 85, 88, 90, 85, 82, 79],
+      data: bpm,
       backgroundColor: 'rgba(54, 162, 235, 0.2)',
       borderColor: 'rgba(54, 162, 235, 1)',
       borderWidth: 1
@@ -212,7 +220,7 @@ const dayNumbers = slicedDates.map(date => {
           <Flex p='15px' color={'white'} bg="btng" borderRadius={'20px'}>
             <FaHeart size={'20px'}  />
           </Flex>
-          <Text fontWeight={'normal'}>Heart Beat <br /> 123bpm</Text>
+          <Text fontWeight={'normal'}>Heart Beat <br /> 120bpm</Text>
 
         </HStack>
 
@@ -240,9 +248,7 @@ const dayNumbers = slicedDates.map(date => {
           <VStack spacing="10px" alignSelf={'flex-start'}>
             <Heading alignSelf={'flex-start'} fontSize={'32px'} lineHeight={'40px'} fontWeight="normal" color="black">My Appointments</Heading>
             <VStack spacing="10px">
-  <Heading alignSelf="flex-start" fontSize="32px" lineHeight="40px" fontWeight="normal" color="black">
-    My Appointments
-  </Heading>
+
   {appointmentData.length > 0 ? (
     <VStack display="flex" flexDirection="column" gap="10px" bg="white" borderRadius="30px" p="20px">
       <HStack alignSelf="flex-start">

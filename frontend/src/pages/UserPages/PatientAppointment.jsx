@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useContext, useState } from 'react'
 import AuthContext from './AuthContext';
-import { Box, Button, Input, Select, Text, VStack,HStack, Toast, useToast } from "@chakra-ui/react";
+import { Box, Button, Input, Select, Text, VStack,HStack, Toast, useToast, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Modal } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 
 function PatientAppointment() {
@@ -17,15 +17,21 @@ function PatientAppointment() {
 
 
     React.useEffect(() => {
+
+      setInterval(() => {
+        fetchPatients();
+      }, 2000);
+        
+      
+        }, [])
+    
         
 
 
     const fetchPatients = async () => {
         try {
           const patientsCollection = await axios.get(`http://localhost:3000/past-appointments-patient/${name}`);
-          //divide futrue array into 2 arrays first 4 and last 4 and combine them as array of arrays
-          console.log("patientsCollection",patientsCollection.data);
-    
+       
     
           if(patientsCollection.data.FutureAppiontments.length > 0){
         //   let future1 = patientsCollection.data.FutureAppiontments.slice(0,4);
@@ -45,9 +51,9 @@ function PatientAppointment() {
     let future = [];
     let i,j,temparray,chunk = 5;
     for (i=0,j=patientsCollection.data.FutureAppiontments.length; i<j; i+=chunk) {
-      console.log("patientsCollection.data.FutureAppiontments",patientsCollection.data.FutureAppiontments)
+      // console.log("patientsCollection.data.FutureAppiontments",patientsCollection.data.FutureAppiontments)
         temparray = patientsCollection.data.FutureAppiontments.slice(i,i+chunk);
-        console.log("temparray",temparray);
+        // console.log("temparray",temparray);
         if(temparray[4] == "cancelled"){
           cancelled.push(temparray);
 
@@ -59,8 +65,8 @@ function PatientAppointment() {
 
 
     }
-    console.log("future",future);
-    console.log("cancelled",cancelled)
+    // console.log("future",future);
+    // console.log("cancelled",cancelled)
     setCancelledAppointments(cancelled);
     setFutureAppointments(future);
     
@@ -76,7 +82,7 @@ function PatientAppointment() {
                 live.push(temparray);
         
             }
-            console.log("live",live);
+            // console.log("live",live);
             setPresentAppointments(live);
         
     
@@ -94,7 +100,7 @@ function PatientAppointment() {
               temparray = patientsCollection.data.pastAppointmetns.slice(i,i+chunk);
               past.push(temparray);
           }
-          console.log("past",past);
+          // console.log("past",past);
           setPastAppointments(past);
     
     
@@ -109,15 +115,9 @@ function PatientAppointment() {
     
     
         } catch (error) {
-          console.error('Error fetching patients:', error);
+         
         }
       };
-setInterval(() => {
-    fetchPatients();
-  }, 1000);
-    
-  
-    }, [pastAppointment, liveAppointment, futureAppointment, cancelledAppointment])
 
     
   const consult = (patientId) => {
@@ -161,6 +161,45 @@ setInterval(() => {
   };
 
 
+
+  const [showprescription, setshowprescription] = useState(false);
+
+  const [prescription, setPrescription] = useState([]);
+
+  console.log('Prescription:', prescription);
+
+
+  const handlePrescription = (appointment) => {
+    setshowprescription(true);
+
+    const patientName = name;
+    const meetingLink = appointment[3];
+
+    console.log('Getting prescription:', meetingLink, patientName);
+
+    try {
+
+      axios.get(`http://localhost:3000/get-prescription/${patientName}/${meetingLink}`)
+        .then((response) => {
+          console.log('Prescription:', response.data);
+          setPrescription(response.data);
+        });
+
+    } catch (error) {
+
+      console.error('Error getting prescription:', error);
+    }
+
+
+
+
+
+
+
+
+  };
+
+  
 
 
 
@@ -217,6 +256,7 @@ setInterval(() => {
         <Box key={appointment.patientId} borderRadius="sm" overflow="hidden"  bg={'whiteAlpha.200'} boxShadow="md" p={4} >
           <Text fontSize="sm">{appointment[1]}</Text>
           <Text fontSize="sm">Time: {appointment[0].startTime}</Text>
+          <Button  onClick={()=>handlePrescription(appointment)} >Prescription</Button>
          
         </Box>
       ))
@@ -241,6 +281,36 @@ setInterval(() => {
       ))
     )}
     </HStack>
+
+
+    {/* create a modal to show prescription */}
+    <Modal isOpen={showprescription} onClose={() => setshowprescription(false)}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Prescription</ModalHeader>
+      
+        <ModalCloseButton />
+        <ModalBody>
+
+          <VStack>
+            {prescription.map((med) => (
+              <Box key={med.id} borderRadius="sm" overflow="hidden" bg={'whiteAlpha.200'} boxShadow="md" p={4} >
+                <Text fontSize="sm">Medicine: {med.medicationName}</Text>
+                <Text fontSize="sm">Dosage: {med.dosage}</Text>
+            
+                <Text fontSize="sm">Instruction: {med.instructions}</Text>
+              </Box>
+            ))}
+          </VStack>
+          
+        </ModalBody>
+        <ModalFooter>
+          <Button colorScheme="blue" mr={3} onClick={() => setshowprescription(false)}>
+            Close
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
 
            
           </VStack>

@@ -66,9 +66,9 @@ export default function Dropdown({handleToggleDropdown }) {
         )}
        { isRegistered &&
        <>
-        <Button w="100px" h="40px" color="black" bg="btng" onClick={() => navigate('/profile')}>
+        {/* <Button w="100px" h="40px" color="black" bg="btng" onClick={() => navigate('/profile')}>
           Profile
-        </Button>
+        </Button> */}
       
         <Button w="100px" h="40px" color="black" bg="btng" onClick={handleLogout}>
           Log Out

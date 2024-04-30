@@ -27,6 +27,14 @@ app.use(express.json());
 require('dotenv').config();
 
 
+const nodemailer = require('nodemailer');
+
+
+
+
+
+
+
 const api = process.env.x
 console.log(api);
 
@@ -803,6 +811,11 @@ const Clinic = require('./models/clinic');
         let { doctorName, startTime, endTime, patientName, mode ,meetingLink } = req.body;
         console.log("doctorName",doctorName, "startTime",startTime, "endTime",endTime, "patientName",patientName, "mode",mode, "meetingLink",meetingLink)
 
+
+
+
+
+
         
         
         // Find the doctor document with the doctor name
@@ -905,12 +918,61 @@ const Clinic = require('./models/clinic');
 
           }
 
+
+          
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            auth: {
+              user: 'karthiknp554@gmail.com',
+              pass: 'odoe wpqi eaem lytc'
+            }
+          });
+
+          const mailOptions = {
+
+            from: 'karthiknp554@gmail.com',
+            to: patient.email,
+            subject: 'Prescription Details',
+            text:  'Your appointment has been booked successfully. Please click on the link to join the meeting: '
+          };
+
+
+          transporter.sendMail(mailOptions, function(error, info){
+              
+              if (error) {
+                console.log(error);
+              }
+  
+              else {
+  
+                console.log('Email sent: ' + info.response);
+  
+              }
+  
+            }
+
+          );
+
+
+
           await doctor.save();
 
           await patient.save();
 
 
           //upate the patient details in the patient collection
+
+
+          //send email to the patient with the meeting link
+
+        
+
+
+
+
 
        
 
@@ -1612,6 +1674,48 @@ const Clinic = require('./models/clinic');
             }
           }
 
+          //send email to the patient with the prescription details 
+
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            auth: {
+              user: 'karthiknp554@gmail.com',
+              pass: 'odoe wpqi eaem lytc'
+            }
+          });
+
+          const mailOptions = {
+
+            from: 'karthiknp554@gmail.com',
+            to: patient.email,
+            subject: 'Prescription Details',
+            text: `Your prescription details are as follows: Medication Name: ${prescription.medicationName}, Dosage: ${prescription.dosage}, Instructions: ${prescription.instructions}.`,
+          };
+
+
+          transporter.sendMail(mailOptions, function(error, info){
+              
+              if (error) {
+                console.log(error);
+              }
+  
+              else {
+  
+                console.log('Email sent: ' + info.response);
+  
+              }
+  
+            }
+
+          );
+
+
+        
+
+
           await patient.save();
 
           // Update the doctor's document to save prescription details same as above
@@ -1644,16 +1748,30 @@ const Clinic = require('./models/clinic');
       }
     );
 
+    //genrate a json for testing in postman for the prescription details
+
+    // {
+    //   "doctorName": "Dr Raghav",
+    //   "patientName": "karthik",
+    //   "prescription": {
+    //       "medicationName": "Paracetamol",
+    //       "dosage": "4/day",
+    //       "instructions": "Blood Test"
+    //   }
+    // }
+
 
 
 
     //endpoint to fetch prescription details for a specific patient and for a specific appointment from MongoDB
 
-    app.get('/prescription/:patientName/:meetingLink', async (req, res) => {
+    app.get('/get-prescription/:patientName/:meetingLink', async (req, res) => {
         
         try {
   
           const { patientName, meetingLink } = req.params;
+
+          console.log("",patientName, meetingLink)
   
           // Find the patient document with the patient name
   
@@ -1685,6 +1803,48 @@ const Clinic = require('./models/clinic');
       }
 
     );
+
+    //endpoint to fetch prescription details for a specific doctor and for a specific appointment from MongoDB
+
+    app.get('/get-prescription-doctor/:doctorName/:meetingLink', async (req, res) => {
+          
+          try {
+    
+            const { doctorName, meetingLink } = req.params;
+            console.log("doctorName in doc",doctorName, "meetingLink",meetingLink);
+    
+            // Find the doctor document with the doctor name
+            
+            const doctor = await Doctor.findOne({name:doctorName});
+    
+         
+  
+            if (!doctor) {
+              return res.status(404).json({ success: false, error: 'Doctor not found' });
+            }
+  
+            // Find the appointment with the meeting link
+  
+            const appointment = doctor.appointment.find(appointment => appointment.meetingLink === meetingLink);
+  
+            if (!appointment) {
+              return res.status(404).json({ success: false, error: 'Appointment not found' });
+            }
+  
+            res.status(200).json(appointment.prescriptions);
+  
+          } catch (error) {
+  
+            console.error('Error fetching prescription:', error);
+  
+            res.status(500).json({ error: 'Failed to fetch prescription' });
+  
+          }
+  
+        }
+
+      );
+
 
 
 

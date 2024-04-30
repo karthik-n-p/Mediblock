@@ -56,6 +56,8 @@ const DoctorDashboard = () => {
   const [endTime, setEndTime] = useState(null);
   const [slots, setSlots] = useState([]); // Initialize with empty array
   const [doctor, setDoctor] = useState([]); // Initialize with empty array
+
+  const [isSelectTime, setIsSelectTime] = useState(false);
   
   // Function to handle date change
   const handleDateChange = (date) => {
@@ -241,6 +243,96 @@ const handleSaveSlot = () => {
       // Handle error, show error message or update UI accordingly
     });
 };
+
+const [selectedSlots, setSelectedSlots] = useState([]);
+console.log("selected slots",selectedSlots);
+
+const handleSelectSlot = (slot) => {
+  if (selectedSlots.includes(slot)) {
+    setSelectedSlots(selectedSlots.filter((selectedSlot) => selectedSlot !== slot));
+  } else {
+    setSelectedSlots([...selectedSlots, slot]);
+  }
+};
+
+const handleslotSelection = () => {
+
+  const doctorName = auth.currentUser.displayName;
+
+  //like handleSaveSlot function convert the selected slots to IST and send to backend one by one in loop
+
+  selectedSlots.forEach((slot) => {
+
+    console.log("slot",slot);
+    // split the slot to get start and end time
+
+    const starttime1 = slot.split('-')[0];
+    const endtime1 = slot.split('-')[1];
+
+    console.log("starttime1",starttime1);
+    console.log("endtime1",endtime1);
+
+   //now merge the selected date with start time and end time
+
+   const startDateTime1 = new Date( selectedDate);
+
+   const endDateTime1 = new Date( selectedDate);
+
+
+    // Convert start time1 to IST and merge with selected date1
+    const startDateTime = new Date(
+      startDateTime1.getFullYear(),
+      startDateTime1.getMonth(),
+      startDateTime1.getDate(),
+      parseInt(starttime1.split(':')[0]),
+      parseInt(starttime1.split(':')[1]),
+      0
+    );
+
+    // Convert end time1 to IST and merge with selected date1
+    const endDateTime = new Date(
+      endDateTime1.getFullYear(),
+      endDateTime1.getMonth(),
+      endDateTime1.getDate(),
+      parseInt(endtime1.split(':')[0]),
+      parseInt(endtime1.split(':')[1]),
+      0
+    );
+
+    console.log("Start Time (IST):", startDateTime.toLocaleString());
+    console.log("End Time (IST):", endDateTime.toLocaleString());
+
+    const data = {
+      doctorName,
+      startTime: startDateTime,
+      endTime: endDateTime,
+    };
+
+    // Send data to backend
+    axios
+      .post("http://localhost:3000/create-slot", data)
+      .then((response) => {
+        console.log(response.data);
+        // Close the modal after successful creation
+        setIsSelectTime(false);
+        // Optionally, you can update UI or show a success message
+      })
+      .catch((error) => {
+        console.error("Error creating time slot:", error);
+        // Handle error, show error message or update UI accordingly
+      });
+
+
+
+
+
+  });
+
+}
+
+
+
+
 return (
   <Flex pl={'150'} minHeight="100vh" flexDirection="row" bg={'bg'}>
     <Box flex="1" bg={'bg'}>
@@ -274,8 +366,11 @@ return (
             placeholderText="Select date"
           />
         </FormControl>
-        <Button color="white" bg="blue.500" mt={4} onClick={() => setIsModalOpen(true)}>
+        <Button mr={'16px'} color="white" bg="blue.500" mt={4} onClick={() => setIsModalOpen(true)}>
           Create Time Slot
+        </Button>
+        <Button color="white" bg="blue.500" mt={4} onClick={() => setIsSelectTime(true)}>
+          Select Appointment
         </Button>
 
         <Box mt={8}>
@@ -284,6 +379,7 @@ return (
               <TableCaption>Time Slots</TableCaption>
               <Thead>
                 <Tr>
+                  <Th>Date</Th>
                   <Th>Start Time</Th>
                   <Th>End Time</Th>
                   <Th>Action</Th>
@@ -292,6 +388,7 @@ return (
               <Tbody>
                 {slots.map((slot) => (
                   <Tr key={slot._id}>
+                    <Td>{slot.timeSlots[0].startTime ? new Date(slot.timeSlots[0].startTime).toLocaleDateString() : ""}</Td>
                     <Td>{slot.timeSlots[0].startTime ? new Date(slot.timeSlots[0].startTime).toLocaleTimeString() : ""}</Td>
                     <Td>{slot.timeSlots[0].endTime ? new Date(slot.timeSlots[0].endTime).toLocaleTimeString() : ""}</Td>
                     <Td>
@@ -309,6 +406,72 @@ return (
         </Box>
       </Container>
     </Flex>
+
+    <Modal isOpen={isSelectTime} onClose={() => setIsSelectTime(false)} motionPreset="slideInBottom">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Select Time Slot</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+         {/*  Give option to select 6 time slots between 9 to 6 am of 30 interval         */}
+
+         <Stack spacing={4}>
+  <Button
+    colorScheme={selectedSlots.includes("9:00 AM - 9:30 AM") ? "green" : "blue"}
+    onClick={() => handleSelectSlot("9:00 AM - 9:30 AM")}
+  >
+    9:00 AM - 9:30 AM
+  </Button>
+  <Button
+    colorScheme={selectedSlots.includes("9:30 AM - 10:00 AM") ? "green" : "blue"}
+    onClick={() => handleSelectSlot("9:30 AM - 10:00 AM")}
+  >
+    9:30 AM - 10:00 AM
+  </Button>
+  <Button
+    colorScheme={selectedSlots.includes("10:00 AM - 10:30 AM") ? "green" : "blue"}
+    onClick={() => handleSelectSlot("10:00 AM - 10:30 AM")}
+  >
+    10:00 AM - 10:30 AM
+  </Button>
+  <Button
+    colorScheme={selectedSlots.includes("10:30 AM - 11:00 AM") ? "green" : "blue"}
+    onClick={() => handleSelectSlot("10:30 AM - 11:00 AM")}
+  >
+    10:30 AM - 11:00 AM
+  </Button>
+  <Button
+    colorScheme={selectedSlots.includes("11:00 AM - 11:30 AM") ? "green" : "blue"}
+    onClick={() => handleSelectSlot("11:00 AM - 11:30 AM")}
+  >
+    11:00 AM - 11:30 AM
+  </Button>
+  <Button
+    colorScheme={selectedSlots.includes("11:30 AM - 12:00 PM") ? "green" : "blue"}
+    onClick={() => handleSelectSlot("11:30 AM - 12:00 PM")}
+  >
+    11:30 AM - 12:00 PM
+  </Button>
+</Stack>
+
+
+
+         
+        </ModalBody>
+        <ModalFooter>
+          <Button  onClick={() => handleslotSelection()} colorScheme="blue" mr={3}>
+            Select
+          </Button>
+          <Button onClick={() => setIsSelectTime(false)}>Cancel</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+
+
+
+
+
+
 
     {/* Modal for adding time slots */}
     <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} motionPreset="slideInBottom">
