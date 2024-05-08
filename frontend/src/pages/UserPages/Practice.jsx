@@ -47,7 +47,7 @@ const PatientCard = ({pastAppointment, futureAppointment,liveAppointment,cancell
 
     try {
 
-      await axios.post('http://localhost:3000/cancel-appointment', {
+      await axios.post('https://mediblock-ala2.onrender.com/cancel-appointment', {
         meetingLink,
         doctorName,
         patientName,
@@ -90,7 +90,7 @@ const PatientCard = ({pastAppointment, futureAppointment,liveAppointment,cancell
 
     try {
 
-      axios.get(`http://localhost:3000/get-prescription-doctor/${doctorName}/${meetingLink}`)
+      axios.get(`https://mediblock-ala2.onrender.com/get-prescription-doctor/${doctorName}/${meetingLink}`)
         .then((response) => {
           console.log('Prescription:', response.data);
           setPrescription(response.data);
@@ -262,7 +262,7 @@ const PracQues = () => {
 
   const fetchDoctors = async () => {
     try {
-      const doctorsCollection = await axios.get('http://localhost:3000/doctors');
+      const doctorsCollection = await axios.get('https://mediblock-ala2.onrender.com/doctors');
       setDoctorsData(doctorsCollection.data);
       console.log("doctors",doctorsCollection.data);
     } catch (error) {
@@ -272,7 +272,7 @@ const PracQues = () => {
 
   const fetchPatients = async (doctorName) => {
     try {
-      const patientsCollection = await axios.get(`http://localhost:3000/past-appointments/${doctorName}`);
+      const patientsCollection = await axios.get(`https://mediblock-ala2.onrender.com/past-appointments/${doctorName}`);
       //divide futrue array into 2 arrays first 4 and last 4 and combine them as array of arrays
 
 

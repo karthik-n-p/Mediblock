@@ -38,7 +38,7 @@ const { username } = React.useContext(AuthContext);
   useEffect(() => {
     const fetchData = () => {
       // Fetch list of doctors from the backend
-      axios.get('http://localhost:3000/doctors')
+      axios.get('https://mediblock-ala2.onrender.com/doctors')
         .then(response => {
           setDoctors(response.data);
           console.log("doctors",response.data);
@@ -48,7 +48,7 @@ const { username } = React.useContext(AuthContext);
         });
 
         //fetch the names of doctors who have access to the patient data
-        axios.get(`http://localhost:3000/shared-doctors/${username}`)
+        axios.get(`https://mediblock-ala2.onrender.com/shared-doctors/${username}`)
         .then(response => {
           setSharedDoctors(response.data);
           console.log("shared doctors",response.data);
@@ -61,7 +61,7 @@ const { username } = React.useContext(AuthContext);
         
   
       // Fetch shared files for doctor from the backend
-      axios.get(`http://localhost:3000/shared-documents/${username}`)
+      axios.get(`https://mediblock-ala2.onrender.com/shared-documents/${username}`)
         .then(response => {
           setDrdocs(response.data);
           console.log("uploaded files inside dr",response.data);
@@ -71,7 +71,7 @@ const { username } = React.useContext(AuthContext);
         });
   
       // Fetch previously uploaded files from the backend
-      axios.get(`http://localhost:3000/files/${uid}`)
+      axios.get(`https://mediblock-ala2.onrender.com/files/${uid}`)
         .then(response => {
           setUploadedFiles(response.data);
           console.log("uploaded files ",response.data);
@@ -102,7 +102,7 @@ const { username } = React.useContext(AuthContext);
     formData.append('file', selectedFile);
 
     try {
-      const response = await axios.post(`http://localhost:3000/upload/${uid}`, formData, {
+      const response = await axios.post(`https://mediblock-ala2.onrender.com/upload/${uid}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -142,7 +142,7 @@ const { username } = React.useContext(AuthContext);
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/share', {
+      const response = await axios.post('https://mediblock-ala2.onrender.com/share', {
         patientname : username,
         fileId: fileId
       });
@@ -154,7 +154,7 @@ const { username } = React.useContext(AuthContext);
 
   const handleRemoveShare = async (doctorName) => {
     try {
-      const response = await axios.post('http://localhost:3000/remove-shared', {
+      const response = await axios.post('https://mediblock-ala2.onrender.com/remove-shared', {
         patientName : username,
         doctorName
       });

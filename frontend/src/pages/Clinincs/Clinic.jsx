@@ -12,7 +12,7 @@ function Clinic() {
   useEffect(() => {
     // Fetch clinic details from the backend
     const uid = 'IgtjHPhxT1bJa3gqD7Qe4MYm7kj2'; // Replace with the actual UID
-    axios.get(`http://localhost:3000/clinics/${uid}`)
+    axios.get(`https://mediblock-ala2.onrender.com/clinics/${uid}`)
       .then(response => {
         if (response.data.name  === null) {
           console.error('Clinic not found');
@@ -33,7 +33,7 @@ function Clinic() {
       });
 
     // Fetch doctors in the clinic from the backend
-    axios.get(`http://localhost:3000/doctors/${uid}`)
+    axios.get(`https://mediblock-ala2.onrender.com/doctors/${uid}`)
       .then(response => {
         setDoctors(response.data);
       })

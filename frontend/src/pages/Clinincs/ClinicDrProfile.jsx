@@ -14,7 +14,7 @@ function ClinicDrProfile() {
     const fetchDoctors = async () => {
       try {
        
-        const response = await axios.get(`http://localhost:3000/doctors/${uid}`);
+        const response = await axios.get(`https://mediblock-ala2.onrender.com/doctors/${uid}`);
         console.log(response.data);
         console.log(uid);
         //filtering the data to get the doctor with the name in the url
@@ -32,7 +32,7 @@ function ClinicDrProfile() {
 
   const handleRemoveDoctor = async (doctorId) => {
     try {
-      await axios.delete(`http://localhost:3000/remove-doctors/${doctorId}`);
+      await axios.delete(`https://mediblock-ala2.onrender.com/remove-doctors/${doctorId}`);
       setDoctors(doctors.filter((doctor) => doctor._id !== doctorId));
     } catch (error) {
       console.error('Error removing doctor:', error);

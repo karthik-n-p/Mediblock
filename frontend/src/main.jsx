@@ -125,7 +125,7 @@ const App = () => {
           setIsRegistered(true);
   
           localStorage.setItem('authData', JSON.stringify({ username: user.displayName, isdoctor: false, uid: user.uid, isadmin: isAdmin }));
-          axios.post('http://localhost:3000/create-patient', {
+          axios.post('https://mediblock-ala2.onrender.com/create-patient', {
             username: userData.username,
             email: user.email,
             uid: user.uid,
@@ -136,7 +136,7 @@ const App = () => {
           setUsername(user.displayName);
           setIsRegistered(true);
           localStorage.setItem('authData', JSON.stringify({ username: user.displayName, isdoctor: false, uid: user.uid, isadmin: isAdmin }));
-          axios.post('http://localhost:3000/create-patient', {
+          axios.post('https://mediblock-ala2.onrender.com/create-patient', {
             username: user.displayName,
             email: user.email,
             uid: user.uid,

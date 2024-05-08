@@ -32,7 +32,7 @@ function BookSlot() {
   useEffect(() => {
     const fetchSlots = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/get-slots/${name}`);
+        const response = await axios.get(`https://mediblock-ala2.onrender.com/get-slots/${name}`);
         
         setSlots(response.data);
         console.log("response in booking slot page",response.data);
@@ -133,7 +133,7 @@ function BookSlot() {
 
 
 
-    const respone = await axios.post(`http://localhost:3000/book-slot`, {
+    const respone = await axios.post(`https://mediblock-ala2.onrender.com/book-slot`, {
       doctorName: name,
       date: selectedDate,
       startTime: selectedTimeSlot.startTime,

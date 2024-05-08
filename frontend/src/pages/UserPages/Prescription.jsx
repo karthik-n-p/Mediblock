@@ -75,7 +75,7 @@ const Prescription = () => {
 
     try {
       // Send prescription details to backend
-      await axios.post('http://localhost:3000/save-prescription', {
+      await axios.post('https://mediblock-ala2.onrender.com/save-prescription', {
         doctorName: username, // Assuming username is the doctor's name
         patientName,
         prescription: prescriptionData,

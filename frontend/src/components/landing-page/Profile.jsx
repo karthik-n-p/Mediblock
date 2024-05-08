@@ -45,7 +45,7 @@ function Profile() {
               // console.error('Error fetching patients: Username is not available');
               return;
           }
-            const patientsCollection = await axios.get(`http://localhost:5173/past-appointments-patient/${username}`);
+            const patientsCollection = await axios.get(`https://mediblock-ala2.onrender.com/past-appointments-patient/${username}`);
             //divide futrue array into 2 arrays first 4 and last 4 and combine them as array of arrays
             console.log("patientsCollection",patientsCollection.data);
 

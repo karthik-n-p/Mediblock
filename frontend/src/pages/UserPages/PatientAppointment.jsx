@@ -30,7 +30,7 @@ function PatientAppointment() {
 
     const fetchPatients = async () => {
         try {
-          const patientsCollection = await axios.get(`http://localhost:3000/past-appointments-patient/${name}`);
+          const patientsCollection = await axios.get(`https://mediblock-ala2.onrender.com/past-appointments-patient/${name}`);
        
     
           if(patientsCollection.data.FutureAppiontments.length > 0){
@@ -136,7 +136,7 @@ function PatientAppointment() {
 
     try {
 
-      await axios.post('http://localhost:3000/cancel-appointment', {
+      await axios.post('https://mediblock-ala2.onrender.com/cancel-appointment', {
         meetingLink,
         doctorName,
         patientName,
@@ -179,7 +179,7 @@ function PatientAppointment() {
 
     try {
 
-      axios.get(`http://localhost:3000/get-prescription/${patientName}/${meetingLink}`)
+      axios.get(`https://mediblock-ala2.onrender.com/get-prescription/${patientName}/${meetingLink}`)
         .then((response) => {
           console.log('Prescription:', response.data);
           setPrescription(response.data);
