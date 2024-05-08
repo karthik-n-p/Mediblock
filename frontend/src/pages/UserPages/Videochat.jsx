@@ -6,12 +6,13 @@ import Prescription from "./Prescription"; // Import the Prescription component
 function Videochat() {
   const { roomId } = useParams();
   const elementRef = useRef(null);
+  const appID = import.meta.env.VITE_APP_ID;
+  const serverSecret = import.meta.env.VITE_SERVER_SECRET;
   
 
   useEffect(() => {
     const meeting = async () => {
-      const appID = 1145816925;
-      const serverSecret = "e8fbdcfcdd9d2daa47f6246eaaf12cf1";
+
       const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
         appID,
         serverSecret,

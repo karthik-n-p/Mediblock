@@ -91,9 +91,9 @@ if (presentAppointments.length > 0) {
     
 useEffect(() => {
   const fetchSheetData = async () => {
-    const SPREADSHEET_ID = '1FhZVjp-vLu4pes2Z2UGYS9kfXEIOOcSVa3OUMrsxImM'; // Replace with your actual spreadsheet ID
-const SHEET_NAME = 'History'; // Replace with the actual name of your sheet if it's different
-const API_KEY = 'AIzaSyDZ8Jd8Z2vYK8aVYyr6QHpg7uvwYKBIH0k'; // Replace with your actual API key
+    const SPREADSHEET_ID = import.meta.env.VITE_SPREADSHEET_ID; // Replace with the actual ID of your Google Sheet
+const SHEET_NAME = 'Sheet1'; // Replace with the actual name of your sheet
+const API_KEY1 = import.meta.env.VITE_API_KEY; // Replace with your API key
 
 
     try {
