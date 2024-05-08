@@ -6,7 +6,7 @@ import Prescription from "./Prescription"; // Import the Prescription component
 function Videochat() {
   const { roomId } = useParams();
   const elementRef = useRef(null);
-  const appID = import.meta.env.VITE_APP_ID;
+  const appID = import.meta.env.VITE_APP_ID1;
   const serverSecret = import.meta.env.VITE_SERVER_SECRET;
   
 

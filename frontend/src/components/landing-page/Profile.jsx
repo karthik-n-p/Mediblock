@@ -88,19 +88,20 @@ if (presentAppointments.length > 0) {
 } else if (futureAppointments.length > 0) { // If no live appointments, check for upcoming appointments
   appointmentData = futureAppointments;
 } 
+const SPREADSHEET_ID = import.meta.env.VITE_SPREADSHEET_ID; // Replace with the actual ID of your Google Sheet
+const SHEET_NAME = 'History'; // Replace with the actual name of your sheet
+const API_KEY1 = import.meta.env.VITE_API_KEY1; // Replace with your API key
+
     
 useEffect(() => {
   const fetchSheetData = async () => {
-    const SPREADSHEET_ID = import.meta.env.VITE_SPREADSHEET_ID; // Replace with the actual ID of your Google Sheet
-const SHEET_NAME = 'Sheet1'; // Replace with the actual name of your sheet
-const API_KEY1 = import.meta.env.VITE_API_KEY; // Replace with your API key
-
+   
 
     try {
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}`;
       const response = await axios.get(url, {
         params: {
-          key: API_KEY,
+          key: API_KEY1,
         },
       });
       const data = response.data.values;
