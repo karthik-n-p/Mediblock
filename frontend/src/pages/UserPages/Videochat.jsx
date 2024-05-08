@@ -26,7 +26,7 @@ function Videochat() {
         sharedLinks: [
           {
             name: "Copy Link",
-            url: `http://localhost:5173/room/${roomId}`,
+            url: `https://mediblock-prkp.onrender.com/room/${roomId}`,
           },
         ],
         scenario: {
