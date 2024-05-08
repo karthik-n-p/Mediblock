@@ -200,6 +200,7 @@ const App = () => {
              
             
               <Route path="/clinic" element={<ClinicDashboard />} />
+              <Route path='/unauthorized' element={<Unauthorized />} />
                    </Routes>
           </ChakraProvider>
         </BrowserRouter>

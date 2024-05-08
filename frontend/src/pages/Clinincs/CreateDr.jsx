@@ -51,7 +51,7 @@ const CreateDr = () => {
     }
 
     try {
-      const createUserResponse = await axios.post(`http://localhost:5173/create-user/${uid}`, { email: institutionalEmail , name: name });
+      const createUserResponse = await axios.post(`http://localhost:3000/create-user/${uid}`, { email: institutionalEmail , name: name });
 
       if (createUserResponse.data.success) {
         // Doctor creation successful, proceed to save details in Firestore
@@ -64,7 +64,7 @@ const CreateDr = () => {
           role: "doctor",
         };
 
-        const saveDoctorResponse = await axios.post(`http://localhost:5173/save-doctor/${uid}`, doctorData);
+        const saveDoctorResponse = await axios.post(`http://localhost:3000/save-doctor/${uid}`, doctorData);
 
         if (saveDoctorResponse.data.success) {
           toast({

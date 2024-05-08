@@ -16,6 +16,7 @@ import { MdCall } from 'react-icons/md';
 import { FaUserCircle } from 'react-icons/fa';
 
 import { FaHeartbeat } from 'react-icons/fa';
+import { auth } from '../../pages/UserPages/firebase-auth';
 
 
 
@@ -25,7 +26,7 @@ const Sidebar = () => {
   const { isRegistered } = React.useContext(AuthContext);
   const {isadmin} = useContext(AuthContext);
   const {isdoctor ,username} = useContext(AuthContext);
-
+  const uid = auth.currentUser?.uid;
 
   console.log("isadmin in sidebar",isadmin);
   const handleToggleExpand = () => {
@@ -51,7 +52,7 @@ const Sidebar = () => {
         </Link>
         
        
-        <Link to={isadmin?'/create-dr' :'/appointment'}>
+        <Link to={isadmin?`/create-dr/${uid}` :'/appointment'}>
         <HStack spacing="20px" p="" onClick={() => handleIconClick("Practice")}>
           <Box  width="60px" height="60px" borderRadius="40px" border='5px solid white'  display="flex" justifyContent="center" alignItems="center"  name='home'  bg={highlightedIcon === "Practice" ? "btng" : "bg"} >
             {isadmin? <MdAdd  color={highlightedIcon === "Practice" ? "white" : "black"} size="30px" /> : <MdCall  color={highlightedIcon === "Practice" ? "white" : "black"} size="30px" />}

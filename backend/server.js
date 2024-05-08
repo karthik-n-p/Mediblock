@@ -35,26 +35,35 @@ const nodemailer = require('nodemailer');
 
 
 
-const api = process.env.x
-console.log(api);
-
-
 mongoose.connect(process.env.MONGODB_URI,)
   .then(() => logger.info('Connected to MongoDB'))
   .catch(err => logger.error('MongoDB connection error:', err));
 
-
-const openaiapi = process.env.OPENAI_API_KEY
-console.log(openaiapi);
 
 //to test tessaract-ocr package getting text from image
 
 var generator = require('generate-password');
 
     //Admin Firebase
-    const admin = require('firebase-admin');
-    const serviceAccount = require('./pack.json');
-    
+   //Admin Firebase
+   const admin = require('firebase-admin');
+
+   const serviceAccount = {
+      "type": process.env.type,
+      "project_id": process.env.project_id,
+      "private_key_id": process.env.private_key_id,
+      "private_key": process.env.private_key.replace(/\\n/g, '\n'),
+      "client_email": process.env.client_email,
+      "client_id": process.env.client_id,
+      "auth_uri": process.env.auth_uri,
+      "token_uri": process.env.token_uri,
+      "auth_provider_x509_cert_url": process.env.auth_provider_x509_cert_url,
+      "client_x509_cert_url": process.env.client_x509_cert_url,
+      "universe_domain": process.env.universe_domain
+
+
+
+   }
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
@@ -1159,6 +1168,7 @@ const Clinic = require('./models/clinic');
             let totalAppointments = 0;
             let totalOnlineAppointments = 0;
             let totalOfflineAppointments = 0;
+            console.log("id",id);
 
         
             // Create a new Clinic document
@@ -1189,6 +1199,7 @@ const Clinic = require('./models/clinic');
           try {
             uid = req.params.uid;
             const clinic = await Clinic.findOne({id: uid });
+
 
             if (!clinic) {
               return res.status(404).json({ success: false, error: 'Clinic not found' });
@@ -1970,7 +1981,7 @@ const Clinic = require('./models/clinic');
   app.listen(port, () => {
     
     console.log('Server is running on port 3000');
-    console.log('process.env.RAPIDAPI_KEY', api);
+   
   });
 
 

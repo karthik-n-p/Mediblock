@@ -2,19 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { Grid, GridItem, Box, Text, Button, Heading, HStack, VStack } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import Unauthorized from '../AdminPages/Unauthorized';
 
 function Clinic() {
   const [clinic, setClinic] = useState(null);
   const [doctors, setDoctors] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Fetch clinic details from the backend
     const uid = 'IgtjHPhxT1bJa3gqD7Qe4MYm7kj2'; // Replace with the actual UID
-    axios.get(`http://localhost:5173/clinics/${uid}`)
+    axios.get(`http://localhost:3000/clinics/${uid}`)
       .then(response => {
+        if (response.data.name  === null) {
+          console.error('Clinic not found');
+          setError('Clinic not found');
+          setLoading(false);
+          return;
+        }
+        else{
         setClinic(response.data);
-        setLoading(false);
+        setLoading(true);
+        }
+        
+        
       })
       .catch(error => {
         console.error('Error fetching clinic details:', error);
@@ -22,7 +33,7 @@ function Clinic() {
       });
 
     // Fetch doctors in the clinic from the backend
-    axios.get(`http://localhost:5173/doctors/${uid}`)
+    axios.get(`http://localhost:3000/doctors/${uid}`)
       .then(response => {
         setDoctors(response.data);
       })
@@ -36,12 +47,15 @@ function Clinic() {
     console.log('Edit clinic details');
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+
 
   return (
+<>
+    {loading ? ( 
     <Grid bg={'bg'} templateColumns="repeat(4, 1fr)" gap={4} pl={150} >
+      
+       
+
       <GridItem colSpan={4} mb={8}>
         <Box bg="gray.100" p={4} borderRadius="md" textAlign="center">
           <Heading size="lg" mb={4}>Clinic Dashboard</Heading>
@@ -89,7 +103,14 @@ function Clinic() {
           </HStack>
         </VStack>
       </GridItem>
+     
     </Grid>
+   
+  ) : (
+    <Unauthorized />
+  )}
+   </>
+
   );
 }
 
