@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import AuthContext from '../../pages/UserPages/AuthContext'
 import { Box, Heading,Flex,IconButton,Text, Avatar,Card,CardHeader,CardBody,HStack,Button,Image, Divider, VStack, Img } from '@chakra-ui/react'
-import { FaChevronLeft, FaChevronRight, FaGithub, FaInstagram, FaLinkedin, FaLinkedinIn, FaUser, FaClock, FaCalendar, FaChevronCircleRight} from 'react-icons/fa'
+import { FaChevronLeft, FaChevronRight, FaGithub, FaInstagram, FaLinkedin, FaLinkedinIn, FaUser, FaClock, FaCalendar, FaChevronCircleRight, FaWalking} from 'react-icons/fa'
 
 import axios from 'axios'
 import { Link } from 'react-router-dom'
@@ -138,10 +138,40 @@ useEffect(() => {
 
 }, []);
 
-const slicedDates = dates.slice(0, 6);
-const slicedSteps = steps.slice(0, 6);
-const slicedWeight = weight.slice(0, 6);
-const slicedDistance = distance.slice(0, 6);
+//generate random number between 10 and 5
+
+
+
+// Slice the data to display only the last 7 days from end of the array
+const slicedDates = dates.slice (-7);
+
+const slicedSteps = steps.slice(-7);
+const slicedWeight = weight.slice(-7);
+const slicedDistance = distance.slice(-7);
+
+
+var sumSteps = 0;
+var sumWeight = 0;
+var sumDistance = 0;
+var sumBpm = 0;
+
+//calcualate the average of each attribute in the last 7 days
+for (let i = 0; i < slicedSteps.length; i++) {
+  sumSteps += slicedSteps[i];
+  sumWeight += slicedWeight[i];
+  sumDistance += slicedDistance[i];
+  sumBpm += bpm[i];
+}
+const avgSteps = sumSteps / slicedSteps.length;
+const avgWeight = sumWeight / slicedWeight.length;
+const avgDistance = sumDistance / slicedDistance.length;
+const avgBpm = sumBpm / bpm.length;
+
+console.log('avgSteps',avgSteps.toFixed(0));
+console.log('avgWeight',avgWeight.toFixed(0));
+console.log('avgDistance',avgDistance.toFixed(0));
+console.log('avgBpm',avgBpm.toFixed(0));
+
 
 const dayNumbers = slicedDates.map(date => {
   const [day] = date.split('/');
@@ -152,7 +182,7 @@ const dayNumbers = slicedDates.map(date => {
   const bloodStatusData = {
     labels:dayNumbers,
     datasets: [{
-      label: 'Blood Status',
+      label: 'Step Count',
       data: slicedSteps,
       backgroundColor: 'rgba(255, 99, 132, 0.2)',
       borderColor: 'rgba(255, 99, 132, 1)',
@@ -172,10 +202,10 @@ const dayNumbers = slicedDates.map(date => {
   };
 
   const bloodCountData = {
-    labels: ['1', '2', '3', '4', '5', '6', '7'],
+    labels: dayNumbers,
     datasets: [{
       label: 'Blood Count',
-      data: [90, 85, 92, 95, 88, 87, 91],
+      data: slicedDistance,
       backgroundColor: 'rgba(255, 206, 86, 0.2)',
       borderColor: 'rgba(255, 206, 86, 1)',
       borderWidth: 1
@@ -226,7 +256,7 @@ const dayNumbers = slicedDates.map(date => {
           <Flex p='15px' color={'white'} bg="btng" borderRadius={'20px'}>
             <FaHeart size={'20px'}  />
           </Flex>
-          <Text fontWeight={'normal'}>Heart Beat <br /> 120bpm</Text>
+          <Text fontWeight={'normal'}>Heart Beat <br /> 73bpm</Text>
 
         </HStack>
 
@@ -241,14 +271,14 @@ const dayNumbers = slicedDates.map(date => {
       <VStack pos={'relative'} display="flex" flexDirection={'column'} spacing="20px">
         <HStack spacing="20px">
           <VStack spacing="10px">
-            <Heading alignSelf={'flex-start'} fontSize="32px" lineHeight={'40px'} fontWeight="normal" color="black">My Heart Condition</Heading>
+            <Heading alignSelf={'flex-start'} fontSize="32px" lineHeight={'40px'} fontWeight="normal" color="black">My Health Attributes</Heading>
             <HStack spacing="20px" alignItems="center">
-            <Feature title="Steps" value={'Steps Value'} icon={FaChartBar} chartData={bloodStatusData} chartType={'line'} />
+            <Feature title="Step  Count " value={'3200'} icon={FaChartBar} chartData={bloodStatusData} chartType={'line'} />
               <Feature title="Heart Rate" value={'120bpm'} icon={FaChartLine} chartData={heartRateData} chartType={'line'} />
             </HStack>
             <HStack spacing="20px" alignItems="center">
-              <Feature title="Blood Count" value={'80-90'} icon={FaTint} chartData={bloodCountData} chartType={'bar'} />
-              <Feature title="Glucose Level" value={'230/ml'} icon={FaHeart} chartData={glucoseLevelData} chartType={'bar'} />
+              <Feature title="Distance" value={'800'} icon={FaWalking} chartData={bloodCountData} chartType={'bar'} />
+             
             </HStack>
           </VStack>
           <VStack spacing="10px" alignSelf={'flex-start'}>
@@ -267,11 +297,12 @@ const dayNumbers = slicedDates.map(date => {
           <br />
         </Text>
       </HStack>
-      {appointmentData[0].map((appointment) => (
-        <HStack key={appointment._id} borderRadius="20px" p="10px" display="flex" gap="5px" bg="bg">
+      {appointmentData.map((appointment) => (
+        console.log("appointment",appointment),
+        <HStack key={appointment[0]._id} borderRadius="20px" p="10px" display="flex" gap="5px" bg="bg">
           <VStack spacing="10px">
-            <Text fontWeight="normal">{appointment.startTime}</Text>
-            <Text fontWeight="normal">{appointment.endTime}</Text>
+            <Text fontWeight="normal">Start time: {new Date(appointment[0].startTime).toLocaleTimeString()}</Text>
+            <Text fontWeight="normal">End Time : {new Date(appointment[0].endTime).toLocaleTimeString()}</Text>
           </VStack>
         </HStack>
       ))}

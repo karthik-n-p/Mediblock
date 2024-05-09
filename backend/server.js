@@ -250,6 +250,60 @@ const patientIPFSHashes = patient.files.flatMap(innerArray => innerArray.map(fil
 
 
 
+//Endpoint to delete a file from MongoDB and Pinata
+
+app.post('/delete-file', async (req, res) => {
+  const { uid, ipfsHash } = req.body;
+
+
+  try {
+    // Find the patient document with the patient UID
+
+    const patient
+      = await Patient.findOne({ uid });
+
+    if (!patient) {
+      return res.status(404).json({ success: false, error: 'Patient not found' });
+
+    }
+
+    // Remove the file with the specified IPFS hash from the patient's files array
+
+    patient.files = patient.files.filter(file => file.ipfsHash !== ipfsHash);
+
+    await patient.save();
+
+
+    // Delete the file from Pinata
+
+    const response = await axios.delete(
+      `https://api.pinata.cloud/pinning/unpin/${ipfsHash}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PINATA_JWT}`,
+        },
+      }
+    );
+
+    console.log('File deleted from Pinata:', response.data);
+
+    res.status(200).json({ success: true });
+
+  } catch (error) {
+
+    console.error('Error deleting file:', error);
+
+    res.status(500).json({ success: false, error: 'Failed to delete file' });
+
+  }
+
+});
+
+
+
+
+
+
 
 
 
@@ -342,6 +396,7 @@ const Clinic = require('./models/clinic');
           institutionalEmail,
           clinicId: id,
           ClinicName: clinic.name,
+          location: clinic.location,
           role: 'doctor',
           experience,
           experience,
@@ -817,12 +872,12 @@ const Clinic = require('./models/clinic');
 
       try {
 
-        let { doctorName, startTime, endTime, patientName, mode ,meetingLink } = req.body;
+        let { doctorName, startTime, endTime, patientName, mode ,meetingLink,clinicId } = req.body;
         console.log("doctorName",doctorName, "startTime",startTime, "endTime",endTime, "patientName",patientName, "mode",mode, "meetingLink",meetingLink)
 
 
 
-
+       const clinic = await Clinic.findOne({ id: clinicId });
 
 
         
@@ -914,6 +969,10 @@ const Clinic = require('./models/clinic');
           });
           //upate the number of online appointments for the doctor
           doctor.numberofonlineAppointments = doctor. numberofonlineAppointments + 1;
+          clinic.numberofonlineAppointments = clinic. numberofonlineAppointments + 1;
+          clinic.numberofAppointments = clinic. numberofAppointments + 1;
+
+
 
           doctor.appointment.push({ patientName, bookedSlot: {  startTime, endTime }, status: 'booked', mode: 'online', meetingLink });
           patient.appointments.push({ doctorName, bookedSlot: {  startTime, endTime }, status: 'booked', mode: 'online', meetingLink });
@@ -922,6 +981,7 @@ const Clinic = require('./models/clinic');
           else{
             //upate the number of offline appointments for the doctor
             doctor.numberofofflineAppointments = doctor. numberofofflineAppointments + 1;
+            clinic.numberofofflineAppointments = clinic. numberofofflineAppointments + 1;
             doctor.appointment.push({ patientName, bookedSlot: {  startTime, endTime }, status: 'booked', mode: 'offline',meetingLink });
             patient.appointments.push({ doctorName, bookedSlot: {  startTime, endTime }, status: 'booked', mode: 'offline' ,meetingLink});
 
@@ -936,16 +996,20 @@ const Clinic = require('./models/clinic');
             secure: false,
             auth: {
               user: 'karthiknp554@gmail.com',
-              pass: 'odoe wpqi eaem lytc'
+              pass: process.env.PASSWORD
             }
           });
+
+          //replace space with %20 in the patient name
+          const patientName1 = patientName.replace(/ /g, '%20');
 
           const mailOptions = {
 
             from: 'karthiknp554@gmail.com',
             to: patient.email,
-            subject: 'Prescription Details',
-            text:  'Your appointment has been booked successfully. Please click on the link to join the meeting: '
+            subject: 'Appointment Booked',
+            text: `Your appointment has been booked with Dr. ${doctorName} on ${new Date(startTime).toDateString()} at ${new Date(startTime).toLocaleTimeString()}. Please click on the following link to manage consultation: http://localhost:5173/booked-appointment/${patientName1}`
+         
           };
 
 
@@ -1694,7 +1758,7 @@ const Clinic = require('./models/clinic');
             secure: false,
             auth: {
               user: 'karthiknp554@gmail.com',
-              pass: 'odoe wpqi eaem lytc'
+              pass: process.env.PASSWORD
             }
           });
 
@@ -1703,7 +1767,8 @@ const Clinic = require('./models/clinic');
             from: 'karthiknp554@gmail.com',
             to: patient.email,
             subject: 'Prescription Details',
-            text: `Your prescription details are as follows: Medication Name: ${prescription.medicationName}, Dosage: ${prescription.dosage}, Instructions: ${prescription.instructions}.`,
+           
+            text: `Your prescription for consultation with Dr. ${doctorName} on  ${new Date().toDateString()} at ${new Date().toLocaleTimeString()} is as follows: ${prescription.medicationName}, ${prescription.dosage}, ${prescription.instructions} `
           };
 
 
@@ -1934,7 +1999,70 @@ const Clinic = require('./models/clinic');
     );
 
 
+    // //send request to backend to fetch google fit data
+    // const response = await axios.get('http://localhost3000:/fitdata', {
+    //   headers: {
+    //     Authorization: `Bearer ${accessToken}`,
 
+    //   },
+    // });
+
+    //give the backend end point for the above 
+    const { OAuth2Client } = require('google-auth-library');
+  
+  // Set up Google OAuth2 client
+const CLIENT_ID = '680791890514-mk5otjg4nleevcp7ppngl7nkvlcggpk2.apps.googleusercontent.com';
+const CLIENT_SECRET = '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';
+
+const oAuth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET);
+
+
+
+// Function to get the access token
+async function getAccessToken() {
+  try {
+    const { tokens } = await oAuth2Client.getToken();
+    console.log('Access token:', tokens.access_token);
+    return tokens.access_token;
+  } catch (error) {
+    console.error('Error getting access token:', error);
+    return null;
+  }
+}
+
+
+// Endpoint to fetch Google Fit data
+
+app.get('/fitdata', async (req, res) => {
+  try {
+
+    //call function to get the access token
+    const accessToken = await getAccessToken();
+
+
+
+
+    console.log("accessToken",accessToken);
+   
+
+
+    // Fetch Google Fit data
+
+    const response = await axios.get(`https://www.googleapis.com/fitness/v1/users/me/dataSources`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error('Error fetching Google Fit data:', error);
+    res.status(500).json({ error: 'Failed to fetch Google Fit data' });
+  }
+
+}
+);
 
 
 

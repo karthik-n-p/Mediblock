@@ -73,8 +73,17 @@ const DoctorDashboard = () => {
       axios
         .get(`https://mediblock-ala2.onrender.com/get-slots/${username}`)
         .then((response) => {
-          console.log(response.data);
-          setSlots(response.data);
+          console.log("ddd",response.data);
+          console.log("slots",response.data[0].timeSlots[0].availability);
+
+          //based above console log you can filter the slots based on availability
+          //if availability is true then only show the slots
+          //fileter
+          const filteredSlots = response.data.filter((slot) => slot.timeSlots[0].availability === true);
+          console.log("filtered slots",filteredSlots);
+          setSlots(filteredSlots);
+
+         
         })
         .catch((error) => {
           console.error("Error fetching slots:", error);

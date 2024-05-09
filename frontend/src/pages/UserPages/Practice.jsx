@@ -8,8 +8,8 @@ const DoctorCard = ({ doctor }) => {
   const navigate = useNavigate();
 
 
-  const handleBookSlot = (doctorName) => {
-    navigate(`/bookslot/${doctorName}`);
+  const handleBookSlot = (doctorName,clinicId) => {
+    navigate(`/bookslot/${clinicId}/${doctorName}`);
   };
 
   return (
@@ -18,9 +18,11 @@ const DoctorCard = ({ doctor }) => {
         <img src={`https://via.placeholder.com/300x300?text=${doctor.name}`} alt={doctor.name} />
       </Box>
       <Text fontSize={'24px'} color={'black'}>{doctor.name}</Text>
+      <Text fontSize="sm">Clinic: {doctor.ClinicName}</Text>
+      <Text fontSize="sm">Experience: {doctor.experience} years</Text>
       <Text fontSize="sm">Specialist: {doctor.specialization}</Text>
       <Text fontSize="sm">{doctor.description}</Text>
-      <Button onClick={() => handleBookSlot(doctor.name)} colorScheme="teal">Book Meeting</Button>
+      <Button onClick={() => handleBookSlot(doctor.name,doctor.clinicId)} colorScheme="teal">Book Meeting</Button>
     </VStack>
   );
 };
@@ -365,11 +367,23 @@ const PracQues = () => {
   const handleConsult = (patientId) => {
     navigate(`/room/${patientId}`);
   };
+  const [selectedLocation, setSelectedLocation] = useState("");
+
+  const [ selectedclinic, setSelectedclinic] = useState("");
+
+  console.log("selectedClinic",selectedclinic);
 
   const filteredDoctors = doctorsData.filter(doctor =>
     doctor.name.toLowerCase().includes(searchValue.toLowerCase()) &&
-    (selectedDisease === "" || doctor.specialization === selectedDisease)
+    (selectedDisease === "" || doctor.specialization === selectedDisease) &&
+    (selectedLocation === "" || doctor.location === selectedLocation) &&
+    (selectedclinic === "" || doctor.ClinicName === selectedclinic)
   );
+  
+ 
+
+
+
 
   return (
     <Box bg={'bg'} p={4} pl={"150px"}>
@@ -388,6 +402,29 @@ const PracQues = () => {
               <option value="Dermatologist">Dermatologist</option>
             </Select>
           </Box>
+          <Box mb={4}>
+            <Text mb={2} fontSize="lg" fontWeight="bold">Filter by Location:</Text>
+            <Select placeholder="Select location" value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)}>
+              <option value="">All</option>
+              <option value="Kannur">Kannur</option>
+              <option value="Calicut">Calicut</option>
+            </Select>
+          </Box>
+
+          <Box mb={4}>
+            <Text mb={2} fontSize="lg" fontWeight="bold">Filter by Clinic:</Text>
+            <Select placeholder="Select clinic" value={selectedclinic} onChange={(e) => setSelectedclinic(e.target.value)}>
+              <option value="">All</option>
+              <option value="Medi+">Medi+</option>
+              <option value="WeCare">WeCare</option>
+            </Select>
+          </Box>
+
+       
+
+
+
+
           <HStack gap={6}>
             {filteredDoctors.map((doctor) => (
               <DoctorCard key={doctor.id} doctor={doctor} />

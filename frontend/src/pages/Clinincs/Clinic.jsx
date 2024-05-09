@@ -13,7 +13,7 @@ function Clinic() {
 
   useEffect(() => {
     // Fetch clinic details from the backend
-    const uid = 'IgtjHPhxT1bJa3gqD7Qe4MYm7kj2'; // Replace with the actual UID
+    const uid = auth.currentUser.uid;// Replace with the actual UID
     axios.get(`https://mediblock-ala2.onrender.com/clinics/${uid}`)
       .then(response => {
         if (response.data.name  === null) {

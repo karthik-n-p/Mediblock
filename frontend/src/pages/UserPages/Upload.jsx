@@ -10,6 +10,7 @@ import {
   GridItem,
   Select,
   HStack,
+  useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { auth } from './firebase-auth';
@@ -17,6 +18,7 @@ import { MdInsertDriveFile } from 'react-icons/md';
 import AuthContext from './AuthContext';
 
 const PatientModule = () => {
+  const Toast = useToast();
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [drdocs, setDrdocs] = useState([]);
@@ -52,10 +54,17 @@ const { username } = React.useContext(AuthContext);
         .then(response => {
           setSharedDoctors(response.data);
           console.log("shared doctors",response.data);
+        
+
         })
+
+        
         .catch(error => {
           console.error('Error fetching doctors:', error);
         });
+
+
+        //
 
 
         
@@ -92,6 +101,44 @@ const { username } = React.useContext(AuthContext);
     setSelectedFile(event.target.files[0]);
   };
 
+
+  //handle delete with uid and file id as body
+
+  const handleDelete = async (fileId) => {
+
+    try {
+      const response = await axios.post('https://mediblock-ala2.onrender.com/delete-file', {
+        uid,
+        fileId
+      });
+      console.log('File deleted successfully:', response.data);
+
+      Toast({
+        title: "Success",
+        description: "File deleted successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+
+      // Refresh list of uploaded files
+      setUploadedFiles(uploadedFiles.filter(file => file.id !== fileId));
+    } catch (error) {
+      console.error('Error deleting file:', error);
+    }
+  
+
+  };
+
+
+
+
+
+
+
+
+
+
   const handleUpload = async () => {
     if (!selectedFile) {
       console.log('Please select a file');
@@ -108,6 +155,15 @@ const { username } = React.useContext(AuthContext);
         }
       });
       console.log('File uploaded successfully:', response.data);
+
+      Toast({
+        title: "Success",
+        description: "File uploaded successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+
       // Refresh list of uploaded files
       setUploadedFiles([...uploadedFiles, response.data]);
     } catch (error) {
@@ -146,6 +202,16 @@ const { username } = React.useContext(AuthContext);
         patientname : username,
         fileId: fileId
       });
+
+      Toast({
+        title: "Success",
+        description: "File shared successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+
+
       console.log('File shared successfully:', response.data);
     } catch (error) {
       console.error('Error sharing file:', error);
@@ -159,6 +225,14 @@ const { username } = React.useContext(AuthContext);
         doctorName
       });
       console.log('File unshared successfully:', response.data);
+
+      Toast({
+        title: "Success",
+        description: "File unshared successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     }
     catch (error) {
       console.error('Error unsharing file:', error);
@@ -213,6 +287,7 @@ const { username } = React.useContext(AuthContext);
        <MdInsertDriveFile size={32} /> 
        <Text>{file.metadata && file.metadata.name}</Text> {/* Add null check */}
       <Button onClick={() => window.open(`https://ipfs.io/ipfs/${file.ipfs_pin_hash}`, '_blank')}>View</Button>
+      <Button onClick={() => handleDelete(file.id)}>Delete</Button>
 
      
     </GridItem>

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 import { doc, setDoc,getDoc } from 'firebase/firestore';
+import axios from 'axios';
 
 
 const SignUpPage = ({ handleSignupSuccess }) =>  {
@@ -53,27 +54,41 @@ const SignUpPage = ({ handleSignupSuccess }) =>  {
     const handleGoogleSignIn = async () => {
   try {
     const provider = new GoogleAuthProvider();
+    // Add scopes for accessing fitness data
+    provider.addScope('https://www.googleapis.com/auth/fitness.activity.read');
+    provider.addScope('https://www.googleapis.com/auth/fitness.body.read');
+    provider.addScope('https://www.googleapis.com/auth/fitness.location.read');
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     const displayName = user.displayName;
-    // Check if the user document exists in the Firestore collection
-    const userDoc = await getDoc(doc(firestore, "username", user.uid));
+    console.log('Google sign-in successful:', user);
+ 
+   
+
+    const userDoc = await getDoc(doc(firestore, 'username', user.uid));
     if (!userDoc.exists()) {
-      console.log("Inside if(userdocexist):", userDoc.data(),user.displayName);
-      // Create the user document if it doesn't existy
       const userData = {
-        username: displayName, // Extract username from email
+        username: displayName,
       };
-      await setDoc(doc(firestore, "username", user.uid), userData);
+      await setDoc(doc(firestore, 'username', user.uid), userData);
     }
 
-    // Perform the necessary actions upon successful sign-in
+   
+
+
+
+
+
+
+
+
     handleSignupSuccess();
     navigate('/');
   } catch (error) {
-    console.log("Google sign-in failed:", error);
+    console.log('Google sign-in failed:', error);
   }
 };
+
 
 
 

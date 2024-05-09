@@ -8,11 +8,43 @@ import { useContext } from 'react';
 import AuthContext from '../../pages/UserPages/AuthContext';
 import { MdArrowDropDown, MdOutlineArrowDropDown, MdPinDrop } from 'react-icons/md';
 import ProfileSection from '../signup-page/Dropdown';
-
+import { auth } from '../../pages/UserPages/firebase-auth';
+import axios from 'axios';
 
 const Header = () => {
   const { setIsRegistered } = useContext(AuthContext);
+  console.log("authcontext ", auth.currentUser);
   const { isRegistered, username } = React.useContext(AuthContext);
+  useEffect(() => {
+    const fetchfitdata = async () => {
+      try {
+        
+        const accessToken = auth.currentUser.accessToken
+        const refreshToken = auth.currentUser.refreshToken
+        console.log("Access token:", accessToken);
+        console.log("Refresh token:", refreshToken);
+
+        const response = await axios.get('https://www.googleapis.com/fitness/v1/users/me/dataSources', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        
+
+       
+        
+      
+        console.log("Google Fit data:", response.data);
+      } catch (error) {
+        console.error('Error fetching Google Fit data:', error);
+      }
+    };
+
+    fetchfitdata();
+
+      
+  }, [isRegistered]);
+
   console.log("authcontext ", isRegistered);
 
   const location = useLocation();

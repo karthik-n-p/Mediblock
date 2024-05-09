@@ -192,7 +192,7 @@ const App = () => {
               <Route path="/clinic" element={<Clinic/>} />
               <Route path='/Upload' element={<Upload />} />
               <Route path='/doctordashboard' element={<DoctorDashboard />} />
-              <Route path='/bookslot/:name' element={<BookSlot/>}/>
+              <Route path='/bookslot/:clinicId/:name' element={<BookSlot/>}/>
 
               <Route path="/view-doctor/:name" element={<ClinicDrProfile/>} />
 

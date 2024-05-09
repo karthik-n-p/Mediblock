@@ -14,6 +14,7 @@ const doctorSchema = new mongoose.Schema({
   experience: String,
   description: String,
   institutionalEmail: String,
+  location: String,
 
   numberofAppointments: {
     type: Number,
