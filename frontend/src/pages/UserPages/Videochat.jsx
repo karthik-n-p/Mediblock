@@ -7,13 +7,15 @@ function Videochat() {
   const { roomId } = useParams();
   const elementRef = useRef(null);
   
+  const appID = parseInt( import.meta.env.VITE_APP_ID1);
 
+    
+      
+  const serverSecret = import.meta.env.VITE_SERVER_SECRET;
   useEffect(() => {
     const meeting = async () => {
-      
-      const appID = import.meta.env.VITE_APP_ID1;
-      
-      const serverSecret = import.meta.env.VITE_SERVER_SECRET;
+ 
+     
       const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
         appID,
         serverSecret,
@@ -24,12 +26,7 @@ function Videochat() {
       const zc = ZegoUIKitPrebuilt.create(kitToken);
       zc.joinRoom({
         container: elementRef.current,
-        sharedLinks: [
-          {
-            name: "Copy Link",
-            url: `http://localhost:5173/room/${roomId}`,
-          },
-        ],
+    
         scenario: {
           mode: ZegoUIKitPrebuilt.OneONoneCall,
         },
