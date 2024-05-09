@@ -3,11 +3,13 @@ import { Grid, GridItem, Box, Text, Button, Heading, HStack, VStack } from '@cha
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Unauthorized from '../AdminPages/Unauthorized';
+import { auth } from '../UserPages/firebase-auth';
 
 function Clinic() {
   const [clinic, setClinic] = useState(null);
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
+  const uid = auth.currentUser.uid;
 
   useEffect(() => {
     // Fetch clinic details from the backend
@@ -77,7 +79,7 @@ function Clinic() {
         <Box bg="gray.100" p={4} borderRadius="md">
           <Text fontSize="xl" fontWeight="bold" mb={2}>Actions</Text>
           <Text>Manage Doctors:</Text>
-          <Link to="/create-dr">
+          <Link to={`/create-dr/${uid}`}>
             <Button mt={2} colorScheme="teal">Add Doctor</Button>
           </Link>
         </Box>
