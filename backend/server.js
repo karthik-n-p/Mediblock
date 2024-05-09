@@ -1999,24 +1999,7 @@ const Clinic = require('./models/clinic');
     );
 
 
-    // //send request to backend to fetch google fit data
-    // const response = await axios.get('http://localhost3000:/fitdata', {
-    //   headers: {
-    //     Authorization: `Bearer ${accessToken}`,
-
-    //   },
-    // });
-
-    //give the backend end point for the above 
-    const { OAuth2Client } = require('google-auth-library');
   
-  // Set up Google OAuth2 client
-const CLIENT_ID = '680791890514-mk5otjg4nleevcp7ppngl7nkvlcggpk2.apps.googleusercontent.com';
-const CLIENT_SECRET = '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';
-
-const oAuth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET);
-
-
 
 // Function to get the access token
 async function getAccessToken() {
