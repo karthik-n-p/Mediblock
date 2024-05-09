@@ -74,7 +74,7 @@ export default function LandingContent() {
       </VStack>
 
       <HStack  h={'100%'}  w="90vw" display={'flex'} pl={{md:'70px', base:'10px'}} gap={{md:'300px', base:'5px'}}   >
-        <Text alignSelf={'flex-start'} fontSize={{md:"24px", base:"12px"}} fontWeight="thi" color="black" > Lorem ipsum dolor, sit amet   consectetur <br /> adipisicing elit. Eum ipsa doloribus <br /> nisi quo libero, quia isi dsfh </Text>
+        <Text alignSelf={'flex-start'} fontSize={{md:"24px", base:"12px"}} fontWeight="thi" color="black" > "Embark on a Seamless Health Journey with Our Integrated Platform, Where Health, Wellness and Telehealth Unite to Empower Your Well-being."</Text>
         <Image zIndex={'100'}   position={'absolute'} right={{md:'5%',base:'0%'}}  bottom={{md:'-250px',base:'0%'}}    src={LandingPic} alt="LandingPic" w={{md:'500px',base:"260px"}} h={{md:'500px',base:"280px"}} />
         <Box position="relative" alignSelf="flex-end" w="350px" h="150px">
   {/* Outer semi-circle */}
@@ -116,30 +116,28 @@ export default function LandingContent() {
      
     </VStack>
 
-    <HStack  zIndex={'1'} pos={'relative'} my="10px"   w="100%" height={'120px'} bg="btng" color="white" overflow="hidden"  >
+    <HStack zIndex={'1'} pos={'relative'} my="10px" w="100%" height={'120px'} bg="btng" color="white" overflow="hidden">
   <HStack animation="marquee 10s linear infinite" gap={'50px'} >
-  <Text fontSize="64px" fontWeight="bold" > Ai  </Text>
-  <Text fontSize="64px" color={'white'} fontWeight="100" >&nbsp;+&nbsp;</Text>
-    <Text fontSize="64px" fontWeight="bold" >BlockChain</Text>
+    <Text fontSize="64px" fontWeight="bold" >Connecting </Text>
     <Text fontSize="64px" color={'white'} fontWeight="100" >&nbsp;+&nbsp;</Text>
-    <Text fontSize="64px" fontWeight="bold" >Telemedicine</Text>
+    <Text fontSize="64px" fontWeight="bold" >Health</Text>
+    <Text fontSize="64px" color={'white'} fontWeight="100" >&nbsp;+&nbsp;</Text>
+    <Text fontSize="64px" fontWeight="bold" >wellness</Text>
     <Text fontSize="64px" color={'white'} fontWeight="100">&nbsp;+&nbsp;</Text>
-    <Text fontSize="64px" fontWeight="bold" >A</Text>
-
-   
+    <Text fontSize="64px" fontWeight="bold" >Everywhere</Text>
   </HStack>
   <HStack animation="marquee 10s linear infinite" gap={'50px'} >
-    <Text fontSize="64px" fontWeight="bold" >i</Text>
+  <Text fontSize="64px" color={'white'} fontWeight="100" >&nbsp;+&nbsp;</Text>
+    <Text fontSize="64px" fontWeight="bold" >Connecting</Text>
     <Text fontSize="64px" color={'white'} fontWeight="thin" >+</Text>
-    <Text fontSize="64px" fontWeight="bold" >BlockChain</Text>
+    <Text fontSize="64px" fontWeight="bold" >Health</Text>
     <Text fontSize="64px" color={'white'} fontWeight="thin" >+</Text>
-    <Text fontSize="64px" fontWeight="bold" >Telemedicine</Text>
+    <Text fontSize="64px" fontWeight="bold" >Wellness</Text>
     <Text fontSize="64px" color={'white'} fontWeight="thin" >+</Text>
-    <Text fontSize="64px" fontWeight="bold" >IOT</Text>
-    <Text fontSize="64px" color={'white'} fontWeight="thin" >&nbsp;  +  &nbsp;</Text>
-   
+    <Text fontSize="64px" fontWeight="bold" >Everywhere</Text>
   </HStack>
 </HStack>
+
 
 <style>
         {`
@@ -251,8 +249,7 @@ export default function LandingContent() {
                 color: "gray.500",
               }}
             >
-              Lorem ipsum dolor sit amet consect adipisicing elit. Possimus
-              magnam voluptatum cupiditate veritatis in accusamus quisquam.
+              Welcome to our healthcare hub. Secure records, easy doctor communication, streamlined clinic management, find doctors, monitor health in real-time. Experience healthcare's future, today.
             </Text>
           </Box>
           <GridItem colSpan={2}>
@@ -276,18 +273,18 @@ export default function LandingContent() {
               }}
             >
               <Feature title="Upload Medical Records">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Temporibus, soluta..{" "}
+              Securely store and access your medical documents online.
               </Feature>
               <Feature title="Find your doctor">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro, reiciendis?
+              Easily locate and connect with healthcare professionals that meet your specific needs.
               </Feature>
               <Feature title="See realtime health status">
                 {" "}
-               Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima, laboriosam.
+                Monitor your health condition instantly with up-to-date information and insights.
               </Feature>
               <Feature title="Manage your clinic/hospital online">
                 {" "}
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam, exercitationem.
+                Streamline administrative tasks and operations of your clinic or hospital through our online management system.
                 {" "}
               </Feature>
               <Feature title="Enjoy blockchain security">
@@ -296,7 +293,7 @@ export default function LandingContent() {
               </Feature>
               <Feature title="Interact online with you Doctor">
                 {" "}
-               Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, dolore.{" "}
+                Communicate with your healthcare provider conveniently through our online platform.
               </Feature>
             </Stack>
           </GridItem>
