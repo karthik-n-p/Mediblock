@@ -148,6 +148,7 @@ const slicedDates = dates.slice (-7);
 const slicedSteps = steps.slice(-7);
 const slicedWeight = weight.slice(-7);
 const slicedDistance = distance.slice(-7);
+const slicedbpm = bpm.slice(-7);
 
 
 var sumSteps = 0;
@@ -160,17 +161,12 @@ for (let i = 0; i < slicedSteps.length; i++) {
   sumSteps += slicedSteps[i];
   sumWeight += slicedWeight[i];
   sumDistance += slicedDistance[i];
-  sumBpm += bpm[i];
+  sumBpm += slicedbpm[i];
 }
-const avgSteps = sumSteps / slicedSteps.length;
-const avgWeight = sumWeight / slicedWeight.length;
-const avgDistance = sumDistance / slicedDistance.length;
-const avgBpm = sumBpm / bpm.length;
-
-console.log('avgSteps',avgSteps.toFixed(0));
-console.log('avgWeight',avgWeight.toFixed(0));
-console.log('avgDistance',avgDistance.toFixed(0));
-console.log('avgBpm',avgBpm.toFixed(0));
+const avgSteps = (sumSteps / slicedSteps.length).toFixed(0);
+const avgWeight = (sumWeight / slicedWeight.length).toFixed(0);
+const avgDistance = (sumDistance / slicedDistance.length).toFixed(0);
+const avgBpm = (sumBpm / slicedbpm.length).toFixed(0);
 
 
 const dayNumbers = slicedDates.map(date => {
@@ -257,15 +253,9 @@ const dayNumbers = slicedDates.map(date => {
 
 
         <Flex pos={'absolute'} bottom="0px" left={'-10'} zIndex={'9999'} padding={'20px'} flexDirection={'column'} gap={'5px'} bg='#F3F3F3' border={'5px solid white'} borderRadius={'30px'}>
-        <HStack >
-          <Flex p='15px' color={'white'} bg="btng" borderRadius={'20px'}>
-            <FaHeart size={'20px'}  />
-          </Flex>
-          <Text fontWeight={'normal'}>Heart Beat <br /> 73bpm</Text>
+     
 
-        </HStack>
-
-       <Line width={50} height={40} data={heartRateData} /> 
+        <Feature title="Heart Rate" value={avgBpm} icon={FaChartLine} chartData={heartRateData} chartType={'line'} />
 
 
         </Flex>
@@ -278,8 +268,8 @@ const dayNumbers = slicedDates.map(date => {
           <VStack spacing="10px">
             <Heading alignSelf={'flex-start'} fontSize="32px" lineHeight={'40px'} fontWeight="normal" color="black">My Health Attributes</Heading>
             <HStack spacing="20px" alignItems="center">
-            <Feature title="Step  Count " value={'3200'} icon={FaChartBar} chartData={bloodStatusData} chartType={'line'} />
-              <Feature title="Heart Rate" value={'120bpm'} icon={FaChartLine} chartData={heartRateData} chartType={'line'} />
+            <Feature title="Step  Count " value={avgSteps} icon={FaChartBar} chartData={bloodStatusData} chartType={'line'} />
+              <Feature title="Heart Rate" value={avgDistance} icon={FaChartLine} chartData={heartRateData} chartType={'line'} />
             </HStack>
             <HStack spacing="20px" alignItems="center">
               <Feature title="Distance" value={'800'} icon={FaWalking} chartData={bloodCountData} chartType={'bar'} />
