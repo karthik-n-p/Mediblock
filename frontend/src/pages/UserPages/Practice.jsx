@@ -386,6 +386,11 @@ const PracQues = () => {
               <option value="Cardiology">Cardiologist</option>
               <option value="Pediatrician">Pediatrician</option>
               <option value="Dermatologist">Dermatologist</option>
+              <option value="Psychologist">Psychologist</option>
+              <option value="Therapist">Therapist</option>
+              <option value="Nutritionist">Nutritionist</option>
+              <option value="Primary Care Physicians">Primary Care Physicians</option>
+
             </Select>
           </Box>
           <HStack gap={6}>
