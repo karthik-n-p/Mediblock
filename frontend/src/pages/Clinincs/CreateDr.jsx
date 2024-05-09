@@ -146,6 +146,12 @@ const CreateDr = () => {
             <option value="Cardiology">Cardiology</option>
             <option value="Pediatrician">Pediatrics</option>
             <option value="Dermatologist">Dermatology</option>
+            <option value="Psychologist">Psychology</option>
+            <option value="Therapist">Therapist</option>
+            <option value="Nutritionist">Nutritionist</option>
+            <option value="Primary Care Physicians">Primary Care Physicians</option>
+
+
           </Select>
         </FormControl>
         <FormControl w="500px">
