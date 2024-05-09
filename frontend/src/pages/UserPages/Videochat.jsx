@@ -6,13 +6,14 @@ import Prescription from "./Prescription"; // Import the Prescription component
 function Videochat() {
   const { roomId } = useParams();
   const elementRef = useRef(null);
-  const appID = import.meta.env.VITE_APP_ID1;
-  const serverSecret = import.meta.env.VITE_SERVER_SECRET;
   
 
   useEffect(() => {
     const meeting = async () => {
-
+      
+      const appID = import.meta.env.VITE_APP_ID1;
+      
+      const serverSecret = import.meta.env.VITE_SERVER_SECRET;
       const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
         appID,
         serverSecret,
@@ -26,7 +27,7 @@ function Videochat() {
         sharedLinks: [
           {
             name: "Copy Link",
-            url: `https://mediblock-prkp.onrender.com/room/${roomId}`,
+            url: `http://localhost:5173/room/${roomId}`,
           },
         ],
         scenario: {

@@ -15,12 +15,13 @@ function Clinic() {
     axios.get(`https://mediblock-ala2.onrender.com/clinics/${uid}`)
       .then(response => {
         if (response.data.name  === null) {
-          console.error('Clinic not found');
+          console.error('response data', response.data);
           setError('Clinic not found');
           setLoading(false);
           return;
         }
         else{
+          console.error('response data', response.data);
         setClinic(response.data);
         setLoading(true);
         }

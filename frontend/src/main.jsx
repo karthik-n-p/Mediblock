@@ -188,7 +188,7 @@ const App = () => {
               <Route path="/appointment" element={<PracQues />} />
 {/*            
               <Route path="/admin" element={isdoctor ? <DoctorDashboard /> : <Unauthorized />} /> */}
-              <Route path="/create-dr" element={<CreateDr />} />
+              <Route path="/create-dr/:id" element={<CreateDr />} />
               <Route path="/clinic" element={<Clinic/>} />
               <Route path='/Upload' element={<Upload />} />
               <Route path='/doctordashboard' element={<DoctorDashboard />} />
