@@ -212,20 +212,13 @@ const dayNumbers = slicedDates.map(date => {
     }]
   };
 
-  const glucoseLevelData = {
-    labels: ['1', '2', '3', '4', '5', '6', '7'],
-    datasets: [{
-      label: 'Glucose Level',
-      data: [130, 128, 135, 132, 125, 122, 128],
-      backgroundColor: 'rgba(75, 192, 192, 0.2)',
-      borderColor: 'rgba(75, 192, 192, 1)',
-      borderWidth: 1
-    }]
-  };
 
   const Feature = (props) => {
     return (
       <Flex padding={'20px'} flexDirection={'column'} gap={'20px'} bg="white" borderRadius={'30px'} >
+        <>
+        {username === 'Karthik N P' ? (
+          <>
         <HStack id={props.id} >
           <Flex p='15px' color={'white'} bg="btng" borderRadius={'20px'}>
             <props.icon size={'20px'}  />
@@ -235,6 +228,18 @@ const dayNumbers = slicedDates.map(date => {
         </HStack>
 
         {props.chartType === 'line' ? <Line width={50} height={40} data={props.chartData} /> : <Bar width={50} height={40} data={props.chartData} />}
+        </>
+    
+        ) : (
+          <HStack id={props.id} >
+          
+          <Text fontWeight={'normal'}>{props.title} <br />No Data Found </Text>
+
+        </HStack>
+        )}
+        </>
+
+
 
 
       
