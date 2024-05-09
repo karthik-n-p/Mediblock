@@ -14,10 +14,13 @@ import {
   VStack,
   Divider,
   useToast,
+  Grid,
+  Text,
 } from '@chakra-ui/react';
 import AuthContext from './AuthContext';
 import axios from 'axios';
 import { useParams, useSearchParams } from 'react-router-dom';
+import { MdInsertDriveFile } from 'react-icons/md';
 
 
 
@@ -42,6 +45,9 @@ const Prescription = () => {
    const isdoctor = user.isdoctor;
 
    const [send,setsend] = useState(false);
+
+
+
    
  
    
@@ -67,8 +73,21 @@ const Prescription = () => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
-
+  const [drdocs, setDrdocs] = useState([]);
   const { username } = useContext(AuthContext); // Assuming you have a username in your authentication context
+  console.log("username",username);
+  React.useEffect(() => {
+
+    axios.get(`https://mediblock-ala2.onrender.com/shared-documents/${username}`)
+    .then(response => {
+      setDrdocs(response.data);
+      console.log("uploaded files inside dr",response.data);
+    })
+    .catch(error => {
+      console.error('Error fetching files:', error);
+    });
+
+  }, [send]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -188,9 +207,47 @@ const Prescription = () => {
           />
           <FormErrorMessage>Instructions are required</FormErrorMessage>
         </FormControl>
+
+        
+        <VStack alignItems={'left'}   gap={6}>
+          {drdocs && drdocs.length > 0 ? (
+            
+            drdocs.map(file => (
+              
+
+              <VStack alignItems={'left'}  key={file.id} >
+                 <Heading mb="10">Shared Documents {file.patientName}</Heading>
+              <Grid   templateColumns={"repeat(3, 1fr)"}>
+                {file.files.map(f => (
+                  <Box >
+                    <MdInsertDriveFile size={32} />
+                    <Text key={f.id}>{f.filename}</Text>
+                    <Button onClick={() => window.open(`https://ipfs.io/ipfs/${f.ipfsHash}`, '_blank')}>View</Button>
+                  </Box >
+                ))}
+                </Grid>
+              </VStack>
+            ))
+          ) : (
+            <Text>No documents shared</Text>
+          )}
+        </VStack>
+  
+
+
+
+
+
+
+
         <Button type="submit" colorScheme="blue" onClick={handleSubmit}>
           Submit Prescription
         </Button>
+
+        
+
+
+
       </VStack>
       </>
       }

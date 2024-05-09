@@ -22,6 +22,14 @@ function Videochat() {
     
       
   const serverSecret = import.meta.env.VITE_SERVER_SECRET;
+
+  console.log("appID",appID);
+  console.log("serverSecret",serverSecret);
+  console.log("roomId",roomId);
+  
+
+
+
   useEffect(() => {
     const meeting = async () => {
  
@@ -31,7 +39,7 @@ function Videochat() {
         serverSecret,
         roomId,
         Date.now().toString(),
-        username,
+        "Enter your username here",
        
       );
       const zc = ZegoUIKitPrebuilt.create(kitToken);
