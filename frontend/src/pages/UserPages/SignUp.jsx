@@ -110,7 +110,7 @@ const SignUpPage = ({ handleSignupSuccess }) =>  {
                
 
                   <Text fontSize={"md"} fontWeight={"400"} m="25px 0 10px 0">How social log in works</Text>
-                  <Text w="300px" h="130px" color="txtg" fontSize={'sm'}>By signing up, you agree to CodeSpace Terms of Service , Code of Conduct , and Privacy Policy .</Text>
+                  <Text w="300px" h="130px" color="txtg" fontSize={'sm'}>By signing up, you agree to Mediblock Terms of Service , Code of Conduct , and Privacy Policy .</Text>
   
     </Flex>
     <Box mt="100px" ml="55px" display="flex" flexDirection={'column'} alignItems="center" justifyContent="center">

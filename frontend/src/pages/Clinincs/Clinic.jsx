@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Grid, GridItem, Box, Text, Button, Heading, HStack, VStack } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import Unauthorized from '../AdminPages/Unauthorized';
+import Unauthorized from '../Doctor/Unauthorized';
 import { auth } from '../UserPages/firebase-auth';
 
 function Clinic() {

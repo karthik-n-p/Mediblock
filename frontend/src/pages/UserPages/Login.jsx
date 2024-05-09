@@ -173,7 +173,7 @@ const checkAdmin = async (user) => {
               How social log in works
             </Text>
             <Text w="300px" h="130px" color="txtg" fontSize="sm">
-              If the email address associated with your social account matches the email address of your CodeSpace
+              If the email address associated with your social account matches the email address of your Mediblock
               account, you'll be Signed Up. You aren't locked to any particular social account. Questions? contact
               support.
             </Text>

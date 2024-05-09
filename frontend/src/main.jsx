@@ -17,11 +17,11 @@ import Sidebar from './components/landing-page/Navbar';
 import Header from './components/landing-page/header';
 import PracQues from './pages/UserPages/Practice';
 
-import DoctorDashboard from './pages/AdminPages/AdminDashboard';
-import DoctorDashboard1 from './pages/AdminPages/AdminDashboard';
+import DoctorDashboard from './pages/Doctor/AdminDashboard';
+import DoctorDashboard1 from './pages/Doctor/AdminDashboard';
 
 import Videochat from './pages/UserPages/Videochat';
-import Unauthorized from './pages/AdminPages/Unauthorized';
+import Unauthorized from './pages/Doctor/Unauthorized';
 
 import './index.css';
 import ClinicDashboard from './pages/Clinincs/Clinic';
