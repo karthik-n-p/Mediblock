@@ -1,13 +1,23 @@
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { useParams } from "react-router-dom";
 import Prescription from "./Prescription"; // Import the Prescription component
+import AuthContext from "./AuthContext";
+import { auth } from "./firebase-auth";
 
 function Videochat() {
   const { roomId } = useParams();
   const elementRef = useRef(null);
   
   const appID = parseInt( import.meta.env.VITE_APP_ID1);
+  const user = JSON.parse(localStorage.getItem('authData'));
+
+  const isdoctor = user.isdoctor;
+
+
+  const { username } = React.useContext(AuthContext);
+  console.log("d",username);
+
 
     
       
@@ -21,7 +31,8 @@ function Videochat() {
         serverSecret,
         roomId,
         Date.now().toString(),
-        "test"
+        username,
+       
       );
       const zc = ZegoUIKitPrebuilt.create(kitToken);
       zc.joinRoom({
@@ -44,10 +55,13 @@ function Videochat() {
       <div style={{ flex: 1 }}>
         <div ref={elementRef}></div>
       </div>
-      <div style={{ flex: 1 }}>
-        <Prescription /> {/* Render the Prescription component */}
+      {isdoctor && ( 
+      <div style={{ flex: 1, display: isdoctor?"block": "none" }  }>
+        <Prescription />
       </div>
+      )}
     </div>
+     
   );
 }
 
