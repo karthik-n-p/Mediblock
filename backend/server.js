@@ -2001,18 +2001,6 @@ const Clinic = require('./models/clinic');
 
   
 
-// Function to get the access token
-async function getAccessToken() {
-  try {
-    const { tokens } = await oAuth2Client.getToken();
-    console.log('Access token:', tokens.access_token);
-    return tokens.access_token;
-  } catch (error) {
-    console.error('Error getting access token:', error);
-    return null;
-  }
-}
-
 
 
 app.get('/fitdata', async (req, res) => {
