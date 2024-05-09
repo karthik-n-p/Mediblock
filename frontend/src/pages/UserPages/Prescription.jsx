@@ -13,10 +13,13 @@ import {
   Heading,
   VStack,
   Divider,
+  useToast,
 } from '@chakra-ui/react';
 import AuthContext from './AuthContext';
 import axios from 'axios';
 import { useParams, useSearchParams } from 'react-router-dom';
+
+
 
 
 
@@ -29,11 +32,16 @@ const medications = [
 ];
 
 const Prescription = () => {
+  const Toast = useToast();
+
+
 
    //fetch user data from local storage
    const user = JSON.parse(localStorage.getItem('authData'));
 
    const isdoctor = user.isdoctor;
+
+   const [send,setsend] = useState(false);
    
  
    
@@ -65,6 +73,8 @@ const Prescription = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    setsend(true);
+
     // Separate patient name from form data
     const { patientName, ...prescriptionData } = formData;
 
@@ -82,6 +92,13 @@ const Prescription = () => {
         meetingLink,
       });
 
+      Toast({
+        title: "Prescription send Successfully!",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+
       console.log('Prescription submitted successfully');
 
       // Reset form after submission
@@ -95,6 +112,7 @@ const Prescription = () => {
       console.error('Error submitting prescription:', error);
     }
   };
+
   return (
 
     <Box maxW="500px" mx="auto" mt={8} p={6} borderWidth="1px" borderRadius="lg">
@@ -105,7 +123,7 @@ const Prescription = () => {
         Prescription Form
       </Heading>
       <VStack spacing={4}>
-        <FormControl isRequired isInvalid={!formData.patientName}>
+        <FormControl isRequired isInvalid={!formData.patientName}    >
           <FormLabel htmlFor="patientName">Patient Name</FormLabel>
           <Input
             id="patientName"
