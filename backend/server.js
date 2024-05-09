@@ -2014,7 +2014,6 @@ async function getAccessToken() {
 }
 
 
-// Endpoint to fetch Google Fit data
 
 app.get('/fitdata', async (req, res) => {
   try {
