@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Button, Input, Select, Text, VStack,HStack, useToast , ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Modal, Image } from "@chakra-ui/react";
+import { Box, Button, Input, Select, Text, VStack,HStack, useToast , ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Modal, Image, Grid } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "./AuthContext";
 import axios from 'axios';
@@ -13,7 +13,7 @@ const DoctorCard = ({ doctor }) => {
   };
 
   return (
-    <VStack h={'500px'} w={'500px'} alignItems={'left'} justifyContent={'left'} spacing={2} bg="white" p={4} borderRadius="md" >
+    <VStack h={'500px'} w={'350px'} alignItems={'left'} justifyContent={'left'} spacing={2} bg="white" p={4} borderRadius="md" >
       <Box borderRadius="sm" overflow="hidden" >
         <Image src={`https://via.placeholder.com/300x300?text=${doctor.name}`} alt={doctor.name} />
       </Box>
@@ -430,11 +430,13 @@ const PracQues = () => {
 
 
 
-          <HStack gap={6}>
+          <Grid gap={0} templateColumns='repeat(3, 1fr)' rowGap={10} columnGap={2}>
             {filteredDoctors.map((doctor) => (
-              <DoctorCard key={doctor.id} doctor={doctor} />
+           
+             <DoctorCard doctor={doctor} />
+          
             ))}
-          </HStack>
+          </Grid>
         </>
       ) : (
         <Box>
